@@ -1,0 +1,27 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_transportation_reason_manager","transportation.reason manager","model_transportation_reason","stock.group_stock_manager",1,1,1,1
+"access_transportation_reason_user","transportation.reason user","model_transportation_reason","base.group_user",1,0,0,0
+"access_transportation_manager","transportation manager","model_transportation","stock.group_stock_manager",1,1,1,1
+"access_transportation_user","transportation user","model_transportation","base.group_user",1,0,0,0
+"access_goods_description_manager","goods.description manager","model_goods_description","stock.group_stock_manager",1,1,1,1
+"access_goods_description_user","goods.description.user","model_goods_description","base.group_user",1,0,0,0
+"access_carriage_condition_manager","carriage.condition manager","model_carriage_condition","stock.group_stock_manager",1,1,1,1
+"access_carriage_condition_user","carriage.condition user","model_carriage_condition","base.group_user",1,0,0,0
+"access_transport_document","access_transport_document","model_transport_document","base.group_user",1,1,1,1
+"access_transportation_responsible","access_transportation_responsible","model_transportation_responsible","base.group_user",1,1,1,1
+"access_sale_mandate_revision_user","access_sale_mandate_revision user","model_sale_mandate_revision","base.group_user",1,1,1,1
+"access_sale_mandate_line_manager","access_sale_mandate_line manager","model_sale_mandate_line","base.group_sale_manager",1,1,1,1
+"access_sale_mandate_user","access_sale_mandate user","model_sale_mandate","base.group_user",1,0,0,0
+"access_sale_mandate_manager","access_sale_mandate manager","model_sale_mandate","base.group_sale_manager",1,1,1,1
+"access_product_to_return_base_user","access_product_to_return base_user","model_product_to_return","base.group_user",1,1,1,1
+"access_kept_product_to_return_base_user","access_kept_product_to_return base_user","model_kept_product_to_return","base.group_user",1,1,1,1
+"access_sale_mandate_fee_type","access_sale_mandate_fee_type","model_sale_mandate_fee_type","base.group_user",1,1,1,1
+"access_goods_loading_register_line_account_user","access_goods_loading_register_line account_user","model_goods_loading_register_line","account.group_account_user",1,1,1,1
+"access_goods_loading_register_account_user","access_goods_loading_register account_ user","model_goods_loading_register","account.group_account_user",1,1,1,1
+"access_goods_loading_register_line_base_user","access_goods_loading_register_line base_user","model_goods_loading_register_line","base.group_user",1,0,0,0
+"access_goods_loading_register_base_user","access_goods_loading_register base_ user","model_goods_loading_register","base.group_user",1,0,0,0
+"access_margin_scheme_invoice_line_base_user","access_margin_scheme_invoice_line user","model_margin_scheme_invoice_line","base.group_user",1,1,1,1
+"invoice_line_commodity_code_user","access_invoice_line_commodity_code user","model_invoice_line_commodity_code","base.group_user",1,1,1,1
+"access_custom_export_notification_user","access_custom_export_notification user","model_custom_export_notification","base.group_user",1,1,1,1
+"access_stock_production_lot_lock_user","access_stock_production_lot_lock user","model_stock_production_lot_lock","base.group_user",1,0,0,0
+"access_stock_production_lot_lock_manager","access_stock_production_lot_lock manager","model_stock_production_lot_lock","techplus_l10n_it_sale.group_lot_lock_manager",1,1,1,0

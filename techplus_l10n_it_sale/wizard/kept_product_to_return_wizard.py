@@ -1,0 +1,108 @@
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+#    Tech Plus l10n it Sale
+#    Copyright (C) Tech Plus srl (<http://www.techplus.it>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+
+import openerp.addons.decimal_precision as dp
+
+import openerp.exceptions
+
+from openerp.osv import fields
+from openerp.osv.orm import TransientModel
+from openerp.tools.translate import _
+from datetime import date, datetime
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from openerp.tools import float_compare
+
+class kept_product_to_return_wizard(TransientModel):
+    _name = "kept.product.to.return.wizard"
+
+    _columns = {
+        'product_qty': fields.float('Quantity', required=True,
+            digits_compute=dp.get_precision('Product Unit of Measure')),
+        'product_uom_id': fields.related('product_to_return_id', 'move_from_id',
+            'product_uom', type='many2one', relation='product.uom',
+            string='Unit of Measure', readonly=True),
+        'reason': fields.text('Description'),
+        'date': fields.date('Date', required=True),
+        'product_to_return_id': fields.many2one('product.to.return',
+            string='Product To Return', required=True, readonly=True),
+        'quantity_available': fields.float('Quantity Available',
+            digits_compute=dp.get_precision('Product Unit of Measure'),
+            readonly=True),
+        'move_from_id': fields.related('product_to_return_id', 'move_from_id',
+            type='many2one', relation='stock.move', string='Move From',
+            readonly=True),
+        'product_id': fields.related('product_to_return_id', 'product_id',
+            type='many2one', relation='product.product', string='Product',
+            readonly=True),
+        'price_agreed': fields.float('Price Agreed', digits_compute=dp.get_precision('Product Price')),
+    }
+
+    def default_get(self, cr, uid, fields=None, context=None):
+        if context is None:
+            context = {}
+        return_obj = self.pool.get('product.to.return')
+        active_model = context.get('active_model')
+        active_id = context.get('active_id')
+        if active_model != 'product.to.return' or not active_id:
+            return {}
+        return_product = return_obj.browse(cr, uid, active_id, context)
+
+        price_agreed = 0.0
+        if return_product.move_from_id.purchase_line_id:
+            price_agreed = return_product.move_from_id.purchase_line_id.price_unit
+        elif return_product.move_from_id.sale_line_id:
+            price_agreed = return_product.move_from_id.sale_line_id.price_unit
+
+        return {
+            'product_to_return_id': active_id,
+            'quantity_available': return_product.unknown_fate_quantity,
+            'product_uom_id': return_product.product_uom_id.id,
+            'date': datetime.strftime(datetime.now().date(),
+                DEFAULT_SERVER_DATE_FORMAT),
+            'product_id': return_product.product_id.id,
+            'price_agreed': price_agreed,
+        }
+
+    def proceed(self, cr, uid, ids, context=None):
+        kept_obj = self.pool.get('kept.product.to.return')
+        product_obj =self.pool.get('product.product')
+        wizard = self.browse(cr, uid, ids[0], context)
+        # uom_rounding = product_obj.browse(cr, uid, wizard.product_id,
+        #     context=context).uom_id.rounding
+        if wizard.product_qty < 0.0:
+            raise openerp.exceptions.Warning(
+                _('The quantity should be greater then zero!'))
+        if wizard.product_qty > wizard.product_to_return_id.unknown_fate_quantity:
+            p = self.pool.get('decimal.precision').precision_get(cr, uid,
+                'Product Unit of Measure')
+            raise openerp.exceptions.Warning(
+                _('The quantity should be less or equal to %.' + str(p) + 'f!') %
+                wizard.product_to_return_id.unknown_fate_quantity)
+        kept_obj.create(cr, uid, {
+                'move_from_id': wizard.move_from_id.id,
+                'reason': wizard.reason,
+                'date': wizard.date,
+                'product_qty': wizard.product_qty,
+                'price_unit': wizard.price_agreed or 0.0,
+            }, context)
+        return {
+            'type': 'ir.actions.act_window_close',
+        }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard view -->
+        <record id="view_account_kept_product_to_return_wizard_form" model="ir.ui.view">
+            <field name="name">account.kept.product.to.return.wizard.view</field>
+            <field name="model">account.kept.product.to.return.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Account Kept Product To Return" version="7.0">
+                    <group>
+                        <field name="accounting_mode"/>
+                        <field name="invoice_id" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
+                        <field name="voucher_id" attrs="{'invisible': [('voucher_id', '=', False)]}"/>
+                    </group>
+                    <label for="kept_product_to_return_ids"/>
+                    <field name="kept_product_to_return_ids">
+                        <tree>
+                            <field name="partner_id"/>
+                            <field name="product_id"/>
+                            <field name="product_qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="left_amount"/>
+                        </tree>
+                    </field>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_account_kept_product_to_return_wizard" model="ir.actions.act_window">
+            <field name="name">Account Kept Product To Return</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.kept.product.to.return.wizard</field>
+            <field name="view_id" ref="view_account_kept_product_to_return_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- object menu entry -->
+        <record id="account_kept_product_to_return_wizard" model="ir.values">
+            <field name="name">Account Kept Product To Return</field>
+            <field name="model">kept.product.to.return</field>
+            <field name="key">action</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_account_kept_product_to_return_wizard'))" />
+        </record>
+
+        <!-- object menu entry -->
+        <record id="invoice_account_kept_product_to_return_wizard" model="ir.values">
+            <field name="name">Add Kept Product To Return</field>
+            <field name="model">account.invoice</field>
+            <field name="key">action</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_account_kept_product_to_return_wizard'))" />
+        </record>
+
+    </data>
+</openerp>

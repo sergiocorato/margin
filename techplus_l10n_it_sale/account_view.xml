@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Form: Account Tax -->
+        <record id="view_tax_form" model="ir.ui.view">
+            <field name="name">account.tax.form</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+                <field name="description" position="after">
+                    <field name="purchase_print_name"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Form: Account Fiscal Position -->
+        <record id="view_account_position_form" model="ir.ui.view">
+            <field name="name">account.fiscal.position.form</field>
+            <field name="model">account.fiscal.position</field>
+            <field name="inherit_id" ref="account.view_account_position_form"/>
+            <field name="arch" type="xml">
+                <field name="active" position="after">
+                    <!-- <field name="margin_scheme_type"/> -->
+                    <field name="sale_margin_scheme_tax_on_margin" attrs="{'required': [('is_margin_scheme', '=', True)]}"/>
+                    <field name="sale_margin_scheme_tax_on_untaxed" attrs="{'required': [('is_margin_scheme', '=', True)]}"/>
+                    <field name="purchase_margin_scheme_tax"/>
+                    <field name="default_sale_journal_id"/>
+                    <field name="default_purchase_journal_id"/>
+                    <field name="default_sale_refund_journal_id"/>
+                    <field name="default_purchase_refund_journal_id"/>
+                    <field name="is_margin_scheme"/>
+                    <field name="custom_export_notification_required"/>
+                    <field name="commodity_code_required"/>
+                    <field name="shipping_invoice"/>
+                    <field name="include_ivoice_copy_extra_ue"/>
+                    <field name="identity_document_required"/>
+                    <field name="print_lot_ref_on_invoices"/>
+                    <field name="text_invoice_out"/>
+                    <field name="text_invoice_in"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Tree: Stock Picking In (To Refund) -->
+        <record model="ir.ui.view" id="stock_picking_in_to_refund_tree">
+            <field name="name">stock.picking.in.tree</field>
+            <field name="model">stock.picking.in</field>
+            <field name="arch" type="xml">
+                <tree string="Stock Picking In To refund">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="date"/>
+                    <field name="min_date"/>
+                    <field name="carrier_id"/>
+                    <field name="invoice_state"/>
+                    <field name="invoice_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Tree: Stock Picking Out (To incvoice) -->
+        <record model="ir.ui.view" id="stock_picking_out_to_invoice_tree">
+            <field name="name">stock.picking.out.tree</field>
+            <field name="model">stock.picking.out</field>
+            <field name="arch" type="xml">
+                <tree string="Stock Picking Out To incvoice">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="date"/>
+                    <field name="min_date"/>
+                    <field name="carrier_id"/>
+                    <field name="transport_document_id"/>
+                    <field name="invoice_state"/>
+                    <field name="invoice_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action: Stock Picking Out (To incvoice) -->
+        <record model="ir.actions.act_window" id="action_stock_picking_out_to_invoice">
+            <field name="name">Stock Picking Out To Invoice</field>
+            <field name="res_model">stock.picking.out</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="stock.view_picking_out_search"/>
+            <field name="domain">[('type', '=', 'out'), ('invoice_ready', '=', True)]</field>
+            <field name="context">{'default_invoice_state': '2binvoiced'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new stock picking out to invoice.
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_stock_picking_out_to_invoice_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="techplus_l10n_it_sale.stock_picking_out_to_invoice_tree"/>
+            <field name="act_window_id" ref="action_stock_picking_out_to_invoice"/>
+        </record>
+
+        <!-- Action: Picking In to Refund -->
+        <record model="ir.actions.act_window" id="action_stock_picking_in_to_refund">
+            <field name="name">Stock Picking In To Refund</field>
+            <field name="res_model">stock.picking.in</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="stock.view_picking_in_search"/>
+            <field name="domain">[('type', '=', 'in'), ('invoice_state', '=', '2binvoiced'), ('name', 'ilike', 'RETURN'), ('invoice_id', '=', False)]</field>
+            <field name="context">{'default_invoice_state': '2binvoiced'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new stock picing in.
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_stock_picking_in_to_refund_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="techplus_l10n_it_sale.stock_picking_in_to_refund_tree"/>
+            <field name="act_window_id" ref="action_stock_picking_in_to_refund"/>
+        </record>
+
+        <!-- Action: Sale Orders (To incvoice) -->
+        <record model="ir.actions.act_window" id="action_sale_order_to_invoice">
+            <field name="name">Sale Orders To Invoice</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sale.view_sales_order_filter"/>
+            <field name="domain">[('state', 'in', ('invoice_except', 'manual'))]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new sale order.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</openerp>

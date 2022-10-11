@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Product To Return subtypes for messaging / Chatter -->
+        <record id="mt_products_to_be_returned_warning" model="mail.message.subtype">
+            <field name="name">Products To Be Returned Warnings</field>
+            <field name="res_model">product.to.return</field>
+            <field name="default" eval="True"/>
+            <field name="description">Products that should be early returned.</field>
+        </record>
+
+        <record id="mt_late_products_to_be_returned_warning" model="mail.message.subtype">
+            <field name="name">Late Products To Be Returned Warnings</field>
+            <field name="res_model">product.to.return</field>
+            <field name="default" eval="True"/>
+            <field name="description">Late Products that should be returned.</field>
+        </record>
+
+        <!-- Kept Product To Return subtypes for messaging / Chatter -->
+        <record id="mt_kept_products_to_account_warning" model="mail.message.subtype">
+            <field name="name">Products To Account Warnings</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="default" eval="True"/>
+            <field name="description">Products that should be accounted.</field>
+        </record>
+
+        <record id="mt_kept_late_products_to_account_warning" model="mail.message.subtype">
+            <field name="name">Late Products To Account Warnings</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="default" eval="True"/>
+            <field name="description">Late Products that must be accounted.</field>
+        </record>
+
+    </data>
+</openerp>

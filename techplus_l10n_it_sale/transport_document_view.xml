@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+		<!-- Form: Transport Document -->
+		<record model="ir.ui.view" id="transport_document_form">
+			<field name="name">transport.document.form</field>
+			<field name="model">transport.document</field>
+			<field name="arch" type="xml">
+				<form string="Transport Document Form" version="7.0">
+					<header>
+	                    <button name="confirm_transport_document" string="Confirm Document" states="draft" class="oe_highlight"/>
+	                    <button name="confirm_delivery" string="Confirm Delivery" states="confirmed" class="oe_highlight"/>
+	                    <button name="confirmed_transport_document_to_draft" string="Back To Draft" states="confirmed"/>
+	                    <button name="delivered_transport_document_to_confirmed" string="Back To Confirmed" states="delivered"/>
+                        <button name="send_transport_document_by_mail" string="Send Transport Document by Email" type="object" groups="base.group_user"/>
+	                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,delivered"/>
+	                </header>
+                    <field name="warning_message" widget="form_warnings" options="{'fixed': 'top'}"/>
+	                <sheet>
+	                	<field name="id" invisible="1"/>
+
+	                    <h1 class="oe_title">
+	                        <span>Transport Document </span>
+	                        <field name="name" class="oe_inline"/>
+	                    </h1>
+
+	                    <!-- buttons box -->
+	                    <div name="button_box" class="oe_right oe_button_box">
+	                    </div>
+
+	                    <group>
+	                    	<group>
+                                <field name="customer_id" context="{'show_address': 1}" options='{"always_reload": True}'/>
+	                    		<field name="partner_id" on_change="on_change_partner_id(partner_id, context)" context="{'show_address': 1}" options='{"always_reload": True}'/>
+	                    		<field name="person_delegated_for_picking"/>
+	                    	</group>
+	                    	<group>
+	                    		<field name="date_shipping"/>
+	                    		<field name="date_receipt"/>
+	                    		<field name="origin"/>
+                                <field name="partner_delivery_notes" attrs="{'invisible': [('partner_delivery_notes', '=', False)]}"/>
+	                    	</group>
+	                    </group >
+	                    <group attrs="{'invisible': [('person_delegated_for_picking','=',False), ('attached_document_delegation','=',False)]}">
+                            <field name="attached_document_delegation" filename="attached_document_delegation_name" attrs="{'required': [('person_delegated_for_picking','!=',False)]}"/>
+                            <field name="attached_document_delegation_name" invisible="1"/>
+                        </group>
+
+	                    <notebook>
+
+							<page string="Shipping" name="shipping">
+                                <field name="picking_line_ids">
+                                    <tree>
+                                        <field name="picking_id"/>
+                                        <field name="product_id"/>
+                                        <field name="product_qty"/>
+                                        <field name="product_uom"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="transport_document_reason"/>
+                                        <field name="return_date"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" groups="base.group_sale_manager" attrs="{'invisible': [('goods_value_error', '!=', False)]}">
+                                    <field name="goods_dropped_value_lines" attrs="{'invisible': [('goods_dropped_value_lines', '=', 0)]}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <label for="goods_value"/>
+                                    <field name="goods_value" nolabel="1" class="oe_subtotal_footer_separator" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group class="oe_right" colspan="4" attrs="{'invisible': [('goods_value_error', '=', False)]}" groups="base.group_sale_manager">
+                                    <field name="goods_value_error" />
+                                </group>
+								<group>
+									<group>
+										<field name="carriage_condition_id"/>
+										<field name="goods_description_id"/>
+										<field name="transportation_reason_id"/>
+										<field name="transportation_responsible_id"/>
+                                        <field name="insured_value"/>
+                                        <field name="insured_value_text"/>
+									</group>
+									<group>
+										<field name="manual_weight"/>
+										<field name="manual_weight_net"/>
+										<field name="manual_volume"/>
+										<field name="number_of_packages"/>
+										<field name="carrier_id" on_change="on_change_carrier_id(carrier_id, context)"/>
+
+									</group>
+								</group>
+								<label for="shipping_notes"/>
+								<field name="shipping_notes"/>
+							</page>
+
+                            <page string="Check Bypass" groups="techplus_base.group_check_bypass_user">
+                                <button name="%(techplus_base.action_check_bypass_wizard)d" type="action" string="New Bypass" attrs="{'invisible': [('state', 'not in', ('draft', 'sent', 'waiting_lots', 'processing'))]}" class="oe_highlight"/>
+                                <button name="%(techplus_base.action_edit_check_bypass_wizard)d" type="action" string="Edit Bypass" attrs="{'invisible': [('state', 'not in', ('draft', ))]}"/>
+                                <field name="check_bypass_ids">
+                                    <tree create="0" edit="0" delete="0">
+                                        <field name="object_id"/>
+                                        <field name="user_id"/>
+                                        <field name="bypass_datetime"/>
+                                        <field name="check_code"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+							<page string="Delivery Orders" name="pickings">
+								<field name="picking_ids" widget="many2many" domain="[('type', '=', 'out'), ('transport_document_id', '=', False), ('state', '=', 'done'), ('partner_id', '=', partner_id)]" context="{'tree_view_ref': 'stock.view_picking_out_tree'}">
+									<tree>
+										<field name="name"/>
+										<field name="origin"/>
+									    <field name="customer_id"/>
+									    <field name="partner_id"/>
+                                        <field name="contents_html" widget="html"/>
+									    <field name="state"/>
+									</tree>
+								</field>
+							</page>
+
+						</notebook>
+					</sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+				</form>
+			</field>
+		</record>
+
+		<!-- Tree: Transport Document -->
+		<record model="ir.ui.view" id="transport_document_tree">
+		    <field name="name">transport.document.tree</field>
+		    <field name="model">transport.document</field>
+		    <field name="arch" type="xml">
+		        <tree string="Transport Document Tree" colors="blue:state=='draft';green:state=='delivered'">
+		            <field name="name"/>
+		            <field name="customer_id"/>
+		            <field name="partner_id"/>
+		            <field name="date_shipping"/>
+		            <field name="date_receipt"/>
+                    <field name="goods_value" groups="base.group_sale_manager" sum="Total"/>
+		            <field name="state"/>
+		        </tree>
+		    </field>
+		</record>
+
+		<!-- Search: Transport Document -->
+		<record model="ir.ui.view" id="transport_document_search">
+		    <field name="name">transport.document.search</field>
+		    <field name="model">transport.document</field>
+		    <field name="arch" type="xml">
+		        <search string="Transport Document Search View">
+		        	<field name="name"/>
+		        	<field name="customer_id"/>
+		        	<field name="partner_id"/>
+                    <separator/>
+		            <filter name="not_yet_delivered" string="Not Yet Delivered" domain="[('state', '!=', 'delivered')]"/>
+                    <separator/>
+                    <filter name="to_be_invoiced" string="To Be Invoiced" domain="[('to_be_invoiced', '=', True)]"/>
+		            <separator/>
+		            <group expand="0" string="Group By...">
+                        <filter string="Customer" context="{'group_by': 'customer_id'}"/>
+		                <filter string="Destination" context="{'group_by': 'partner_id'}"/>
+                        <filter string="Shipping Date" domain="[]"  context="{'group_by': 'date_shipping'}"/>
+		            </group>
+		        </search>
+		    </field>
+		</record>
+
+		<!-- Action: Transport Document -->
+        <record model="ir.actions.act_window" id="action_transport_documents">
+            <field name="name">Transport Documents</field>
+            <field name="res_model">transport.document</field>
+            <field name="view_mode">tree_with_legend,form</field>
+            <field name="search_view_id" ref="transport_document_search"/>
+            <field name="context">{'search_default_not_yet_delivered': 1}</field>
+        </record>
+        <record id="action_transport_documents_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree_with_legend</field>
+            <field name="view_id" ref="transport_document_tree"/>
+            <field name="act_window_id" ref="action_transport_documents"/>
+        </record>
+
+        <!-- Transportation Reason -->
+
+		<record id="view_transportation_reason_tree" model="ir.ui.view">
+            <field name="name">transportation.reason.tree</field>
+            <field name="model">transportation.reason</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Reasons for transportation">
+                    <field name="name" select="1"/>
+                    <field name="note"/>
+                    <field name="reason"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_transportation_reason_form" model="ir.ui.view">
+            <field name="name">transportation.reason.form</field>
+            <field name="model">transportation.reason</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Reason for transportation">
+                    <field name="name" select="1"/>
+                    <newline/>
+                    <field name="note"/>
+                    <newline/>
+                    <field name="reason"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_transportation_reason_tree" model="ir.actions.act_window">
+            <field name="name">Reasons for transportation</field>
+            <field name="res_model">transportation.reason</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Transportation Responsible -->
+
+		<record id="view_transportation_responsible_tree" model="ir.ui.view">
+            <field name="name">transportation.responsible.tree</field>
+            <field name="model">transportation.responsible</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Transportation Responsibles">
+                    <field name="name" select="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_transportation_responsible_form" model="ir.ui.view">
+            <field name="name">transportation.responsible.form</field>
+            <field name="model">transportation.responsible</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transportation Responsible">
+                    <group>
+                        <field name="name" select="1"/>
+                        <field name="hide_responsible_address"/>
+                        <newline/>
+                        <field name="responsible_type"/>
+                    </group>
+                    <field name="note"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_transportation_responsible_tree" model="ir.actions.act_window">
+            <field name="name">Transportation Responsibles</field>
+            <field name="res_model">transportation.responsible</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Goods Description -->
+
+        <record id="view_goods_description_tree" model="ir.ui.view">
+            <field name="name">goods.description.tree</field>
+            <field name="model">goods.description</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Descriptions of Goods">
+                    <field name="name" select="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="stock_goods_description_form" model="ir.ui.view">
+            <field name="name">goods.description.form</field>
+            <field name="model">goods.description</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Description of Goods">
+                    <field name="name" select="1"/>
+                    <newline/>
+                    <field name="note"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_goods_description_tree" model="ir.actions.act_window">
+            <field name="name">Descriptions of Goods</field>
+            <field name="res_model">goods.description</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Carriage Condition -->
+
+        <record id="view_carriage_condition_tree" model="ir.ui.view">
+            <field name="name">carriage.condition.tree</field>
+            <field name="model">carriage.condition</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Carriage Conditions">
+                    <field name="name" select="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_carriage_condition_form" model="ir.ui.view">
+            <field name="name">carriage.condition.form</field>
+            <field name="model">carriage.condition</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Carriage Condition">
+                    <field name="name" select="1"/>
+                    <field name="incoterm_code"/>
+                    <newline/>
+                    <field name="note"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_carriage_condition_tree" model="ir.actions.act_window">
+            <field name="name">Carriage Conditions</field>
+            <field name="res_model">carriage.condition</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	</data>
+</openerp>
+

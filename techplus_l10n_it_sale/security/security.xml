@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="group_margin_scheme" model="res.groups">
+            <field name="name">Allow setting the margin scheme type on invoices and receipts</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <record id="group_extra_ue_invoices" model="res.groups">
+            <field name="name">Allow extra UE fields on invoices and receipts</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- categories -->
+        <record model="ir.module.category" id="profile_lot_lock_category">
+            <field name="name">Lot Lock</field>
+        </record>
+
+        <record id="group_lot_lock_user" model="res.groups">
+            <field name="name">Lot Lock User</field>
+            <field name="category_id" ref="profile_lot_lock_category"/>
+        </record>
+        <record id="group_lot_lock_manager" model="res.groups">
+            <field name="name">Lot Lock Manager</field>
+            <field name="category_id" ref="profile_lot_lock_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_lot_lock_user'))]"/>
+        </record>
+
+    </data>
+</openerp>

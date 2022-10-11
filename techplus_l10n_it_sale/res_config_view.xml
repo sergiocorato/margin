@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_l10n_it_sale_settings" model="ir.ui.view">
+            <field name="name">view.l10n.it.sale.settings</field>
+            <field name="model">l10n.it.sale.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure Parameters" version="7.0" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group string="Accounting">
+                        <div>
+                            <field name="group_margin_scheme" class="oe_inline"/>
+                            <label for="group_margin_scheme"/>
+                        </div>
+                    </group>
+                    <group string="Stock">
+                        <group>
+                            <div>
+                                <field name="def_stock_move_transportation_reason_required"/>
+                                <label for="def_stock_move_transportation_reason_required"/>
+                            </div>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_l10n_it_sale_settings" model="ir.actions.act_window">
+            <field name="name">L10n IT Sale Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n.it.sale.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+
+        <!-- Account Configuration -->
+        <record id="view_account_config_settings" model="ir.ui.view">
+            <field name="name">view_account_config_settings</field>
+            <field name="model">account.config.settings</field>
+            <field name="inherit_id" ref="techplus_l10n_it.view_account_config_settings"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group[@name='techplus_l10n_it_custom_declaration']" position="after">
+                    <group string="Product To Return" name="techplus_l10n_it_sale_product_to_return">
+                        <label for="id" string="Configuration"/>
+                        <div>
+                            <div>
+                                <label for="out_invoice_auto_keep_sold_product_to_return"/>
+                                <field name="out_invoice_auto_keep_sold_product_to_return" class="oe_inline"/>
+                            </div>
+                        </div>
+                    </group>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</openerp>

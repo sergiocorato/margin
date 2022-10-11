@@ -1,0 +1,267 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!-- EDI related Email Templates menu -->
+        <record model="ir.actions.act_window" id="action_email_transport_document_template">
+            <field name="name">Email Transport Document Form</field>
+            <field name="res_model">email.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="email_template.email_template_tree" />
+            <field name="search_view_id" ref="email_template.view_email_template_search"/>
+            <field name="context" eval="{'search_default_model_id': ref('techplus_l10n_it_sale.model_transport_document')}"/>
+        </record>
+    </data>
+
+    <!-- Mail template is done in a NOUPDATE block
+         so users can freely customize/delete them -->
+    <data noupdate="0">
+
+        <!--Email template Kept Product (IT) -->
+        <record id="email_template_kept_product_notification_it" model="email.template">
+            <field name="name">Notifica prodotto trattenuto (IT)</field>
+            <field name="email_from">${(object.current_user_id.email or '')|safe}</field>
+            <field name="subject">${object.company_id.name} - Notifica prodotto trattenuto: ${object.product_id.name} ${object.lot_id.name and object.lot_id.name.strip() != '/' and '(N. Seriale: %s)' % object.lot_id.name or ''}</field>
+            <field name="email_recipients">${object.partner_id.id}</field>
+            <field name="model_id" ref="techplus_l10n_it_sale.model_kept_product_to_return"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Spettabile ${object.partner_id.name},</p>
+
+    <p>con la presente comunicazione la informiamo di aver trattenuto il seguente prodotto: <strong>${object.product_id.name} ${object.lot_id.name and object.lot_id.name.strip() != '/' and '(Serial: %s)' % object.lot_id.name or ''}</strong></p>
+
+    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+       &nbsp;&nbsp;<strong>RIFERIMENTI</strong><br />
+       &nbsp;&nbsp;Nome prodotto: <strong>${object.product_id.name}</strong><br />
+       % if object.lot_id.name:
+       &nbsp;&nbsp;N. Seriale: <strong>${object.lot_id.name}</strong><br />
+       % endif
+       &nbsp;&nbsp;Quantità: <strong>${object.product_qty} ${object.product_uom_id.name}</strong><br />
+       % if object.price_unit:
+       &nbsp;&nbsp;Prezzo unitario concordato: <strong>${object.price_unit}</strong><br />
+       % endif
+       % if object.price_total:
+       &nbsp;&nbsp;Prezzo totale concordato: <strong>${object.price_total}</strong><br />
+       % endif
+       &nbsp;&nbsp;Trattenuto da: <strong>${object.transportation_reason_text}</strong><br />
+       % if object.move_from_id.picking_id:
+       &nbsp;&nbsp;Data presa in carico: <strong>${object.move_from_id.picking_id.date}</strong><br />
+       % endif
+       % if object.move_from_id.picking_id.ddt_date:
+       &nbsp;&nbsp;Data documento di trasporto: <strong>${object.move_from_id.picking_id.ddt_date}</strong><br />
+       % endif
+       % if object.move_from_id.picking_id.ddt_number:
+       &nbsp;&nbsp;Numero documento di trasporto: <strong>${object.move_from_id.picking_id.ddt_number}</strong><br />
+       % endif
+       % if object.product_to_return_id.sale_mandate_id:
+       &nbsp;&nbsp;Riferimento procura di vendita: <strong>${object.product_to_return_id.sale_mandate_id.name}</strong><br />
+       &nbsp;&nbsp;Data accettazione procura di vendita: <strong>${object.product_to_return_id.sale_mandate_id.acceptance_date}</strong><br />
+       % endif
+    </p>
+
+    <br/>
+    <p>Per qualsiasi richiesta rimaniamo a vs. disposizione.</p>
+    <br/>
+    <br/>
+    <div style="width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;">
+        <h3 style="margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;">
+            <strong style="text-transform:uppercase;">${object.company_id.name}</strong></h3>
+    </div>
+    <div style="width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;">
+        <span style="color: #222; margin-bottom: 5px; display: block; ">
+        % if object.company_id.street:
+            ${object.company_id.street}<br/>
+        % endif
+        % if object.company_id.street2:
+            ${object.company_id.street2}<br/>
+        % endif
+        % if object.company_id.city or object.company_id.zip:
+            ${object.company_id.zip} ${object.company_id.city}<br/>
+        % endif
+        % if object.company_id.country_id:
+            ${object.company_id.state_id and ('%s, ' % object.company_id.state_id.name) or ''} ${object.company_id.country_id.name or ''}<br/>
+        % endif
+        % if object.company_id.vat:
+            p.iva n. ${object.company_id.vat or ''}<br/>
+        % endif
+        </span>
+        % if object.company_id.phone:
+            <div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; ">
+                Telefono:&nbsp; ${object.company_id.phone}
+            </div>
+        % endif
+        % if object.company_id.website:
+            <div>
+                Web :&nbsp;<a href="${object.company_id.website}">${object.company_id.website}</a>
+            </div>
+        %endif
+        % if object.current_user_id and object.current_user_id.id != 1:
+        <div>
+            Contatto di riferimento: <a href="mailto:${object.current_user_id.email or ''}?subject=Prodotto trattenuto%20${object.product_id.name}">${object.current_user_id.name}</a>
+        </div>
+        % endif
+        <p></p>
+    </div>
+</div>
+            ]]></field>
+        </record>
+
+        <!--Email template Kept Product EN -->
+        <record id="email_template_kept_product_notification_en" model="email.template">
+            <field name="name">Kept Product Notification (EN)</field>
+            <field name="email_from">${(object.current_user_id.email or '')|safe}</field>
+            <field name="subject">${object.company_id.name} - Kept Product Notification: ${object.product_id.name} ${object.lot_id.name and object.lot_id.name.strip() != '/' and '(Serial: %s)' % object.lot_id.name or ''}</field>
+            <field name="email_recipients">${object.partner_id.id}</field>
+            <field name="model_id" ref="techplus_l10n_it_sale.model_kept_product_to_return"/>
+            <field name="auto_delete" eval="True"/>
+            <!-- <field name="report_template" ref="report_sale_order"/> -->
+            <!-- <field name="report_name">${(object.name or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field> -->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Hello ${object.partner_id.name},</p>
+
+    <p>hereby inform you that we have kept the product <strong>${object.product_id.name} ${object.lot_id.name and object.lot_id.name.strip() != '/' and '(Serial: %s)' % object.lot_id.name or ''}</strong></p>
+
+    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+       &nbsp;&nbsp;<strong>REFERENCES</strong><br />
+       &nbsp;&nbsp;Product name: <strong>${object.product_id.name}</strong><br />
+       % if object.lot_id.name:
+       &nbsp;&nbsp;Product serial: <strong>${object.lot_id.name}</strong><br />
+       % endif
+       &nbsp;&nbsp;Quantity: <strong>${object.product_qty} ${object.product_uom_id.name}</strong><br />
+       % if object.price_unit:
+       &nbsp;&nbsp;Unit Price Agreed: <strong>${object.price_unit}</strong><br />
+       % endif
+       % if object.price_total:
+       &nbsp;&nbsp;Total Price Agreed: <strong>${object.price_total}</strong><br />
+       % endif
+       &nbsp;&nbsp;Kept from: <strong>${object.transportation_reason_text}</strong><br />
+       % if object.move_from_id.picking_id:
+       &nbsp;&nbsp;Picking date: <strong>${object.move_from_id.picking_id.date}</strong><br />
+       % endif
+       % if object.move_from_id.picking_id.ddt_date:
+       &nbsp;&nbsp;Transport document date: <strong>${object.move_from_id.picking_id.ddt_date}</strong><br />
+       % endif
+       % if object.move_from_id.picking_id.ddt_number:
+       &nbsp;&nbsp;Transport document number: <strong>${object.move_from_id.picking_id.ddt_number}</strong><br />
+       % endif
+       % if object.product_to_return_id.sale_mandate_id:
+       &nbsp;&nbsp;Sale mandate reference: <strong>${object.product_to_return_id.sale_mandate_id.name}</strong><br />
+       &nbsp;&nbsp;Sale mandate acceptance date: <strong>${object.product_to_return_id.sale_mandate_id.acceptance_date}</strong><br />
+       % endif
+    </p>
+
+    <br/>
+    <p>If you have any question, do not hesitate to contact us.</p>
+    <br/>
+    <br/>
+    <div style="width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;">
+        <h3 style="margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;">
+            <strong style="text-transform:uppercase;">${object.company_id.name}</strong></h3>
+    </div>
+    <div style="width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;">
+        <span style="color: #222; margin-bottom: 5px; display: block; ">
+        % if object.company_id.street:
+            ${object.company_id.street}<br/>
+        % endif
+        % if object.company_id.street2:
+            ${object.company_id.street2}<br/>
+        % endif
+        % if object.company_id.city or object.company_id.zip:
+            ${object.company_id.zip} ${object.company_id.city}<br/>
+        % endif
+        % if object.company_id.country_id:
+            ${object.company_id.state_id and ('%s, ' % object.company_id.state_id.name) or ''} ${object.company_id.country_id.name or ''}<br/>
+        % endif
+        % if object.company_id.vat:
+            vat n. ${object.company_id.vat or ''}<br/>
+        % endif
+        </span>
+        % if object.company_id.phone:
+            <div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; ">
+                Phone:&nbsp; ${object.company_id.phone}
+            </div>
+        % endif
+        % if object.company_id.website:
+            <div>
+                Web :&nbsp;<a href="${object.company_id.website}">${object.company_id.website}</a>
+            </div>
+        %endif
+        % if object.current_user_id:
+        <div>
+            Your contact: <a href="mailto:${object.current_user_id.email or ''}?subject=Product%20${object.product_id.name}">${object.current_user_id.name}</a>
+        </div>
+        % endif
+        <p></p>
+    </div>
+</div>
+            ]]></field>
+        </record>
+
+        <!--Email template Transport Document-->
+        <record id="email_template_transport_document" model="email.template">
+            <field name="name">Transport Document - Send by Email</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">Documento di trasporto per ${object.company_id.name}</field>
+            <field name="email_recipients">${object.id}</field>
+            <field name="model_id" ref="techplus_l10n_it_sale.model_transport_document"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="report_template" ref="techplus_l10n_it_sale.transport_document"/>
+            <field name="report_name">Documento di trasporto per ${(object.name or '').replace(('/'),'_').replace(('.'),'')}</field>
+            <!-- <field name="lang">${object.lang}</field> -->
+            <field name="body_html"><![CDATA[
+
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+    <p>Gentile ${object.customer_id.name},</p>
+
+    <p>Alleghiamo una copia del documento di trasporto ${(object.name or '')}.</p>
+
+    <br/>
+    <p>Restiamo a disposizione per qualsiasi chiarimento.</p>
+    <p>Con l'occasione porgiamo distinti saluti.</p>
+    <br/>
+    <p>Grazie per aver scelto ${object.company_id.name or ''}</p>
+    <br/>
+    <br/>
+    <div style="width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;">
+        <h3 style="margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;">
+            <strong style="text-transform:uppercase;">${object.company_id.name}</strong></h3>
+    </div>
+    <div style="width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;">
+        <span style="color: #222; margin-bottom: 5px; display: block; ">
+        % if object.company_id.street:
+            ${object.company_id.street}<br/>
+        % endif
+        % if object.company_id.street2:
+            ${object.company_id.street2}<br/>
+        % endif
+        % if object.company_id.city or object.company_id.zip:
+            ${object.company_id.zip} ${object.company_id.city}<br/>
+        % endif
+        % if object.company_id.country_id:
+            ${object.company_id.state_id and ('%s, ' % object.company_id.state_id.name) or ''} ${object.company_id.country_id.name or ''}<br/>
+        % endif
+        </span>
+        % if object.company_id.phone:
+            <div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; ">
+                Telefono:&nbsp; ${object.company_id.phone}
+            </div>
+        % endif
+        % if object.company_id.website:
+            <div>
+                Web :&nbsp;<a href="${object.company_id.website}">${object.company_id.website}</a>
+            </div>
+        %endif
+        <p></p>
+    </div>
+</div>
+            ]]></field>
+        </record>
+    </data>
+</openerp>

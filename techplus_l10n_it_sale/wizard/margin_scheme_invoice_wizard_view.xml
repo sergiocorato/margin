@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard view -->
+        <record id="view_add_margin_scheme_invoce_line_wizard_form" model="ir.ui.view">
+            <field name="name">add.margin.scheme.invoice.line.wizard.view</field>
+            <field name="model">add.margin.scheme.invoice.line.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Add Line" version="7.0">
+                    <field name="invoice_id" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="invoice_id" on_change="on_change_invoice_id(invoice_id, context)" invisible="1"/>
+                            <field name="register_line_id" on_change="on_change_register_line_id(register_line_id, context)"/>
+                            <field name="purchase_amount"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_add_margin_scheme_invoce_line_wizard" model="ir.actions.act_window">
+            <field name="name">Add Margin Scheme Invoice Line</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">add.margin.scheme.invoice.line.wizard</field>
+            <field name="view_id" ref="view_add_margin_scheme_invoce_line_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- wizard view -->
+        <record id="view_change_margin_scheme_invoce_line_wizard_form" model="ir.ui.view">
+            <field name="name">change.margin.scheme.invoice.line.wizard.view</field>
+            <field name="model">change.margin.scheme.invoice.line.wizard</field>
+            <field name="arch" type="xml">
+                <form string="change Line" version="7.0">
+                    <group>
+                        <group>
+                            <field name="margin_line_id"/>
+                            <field name="lot_id"/>
+                        </group>
+                        <group>
+                            <field name="purchase_amount"/>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_change_margin_scheme_invoce_line_wizard" model="ir.actions.act_window">
+            <field name="name">change Margin Scheme Invoice Line</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">change.margin.scheme.invoice.line.wizard</field>
+            <field name="view_id" ref="view_change_margin_scheme_invoce_line_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

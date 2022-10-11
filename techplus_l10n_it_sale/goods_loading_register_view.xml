@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Tree: Goods Loading Register -->
+        <record model="ir.ui.view" id="goods_loading_register_tree">
+            <field name="name">goods.loading.register.tree</field>
+            <field name="model">goods.loading.register</field>
+            <field name="arch" type="xml">
+                <tree string="Goods Loading Register Tree">
+                    <field name="name"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form: Goods Loading Register -->
+        <record model="ir.ui.view" id="goods_loading_register_form">
+            <field name="name">goods.loading.register.form</field>
+            <field name="model">goods.loading.register</field>
+            <field name="arch" type="xml">
+                <form string="Goods Loading Register Form" version="7.0">
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name"/></h1>
+
+                        </div>
+
+                        <div class="oe_right oe_button_box">
+                            <!-- buttons here -->
+                        </div>
+
+                        <group>
+                            <group>
+
+                            </group>
+                            <group>
+                                <field name="fiscalyear_id"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Entries">
+                                <field name="line_ids">
+                                    <tree editable="bottom" colors="blue:state == 'draft';green:state == 'unloaded';">
+                                        <field name="code"/>
+                                        <field name="date_in"/>
+                                        <field name="document_in"/>
+                                        <field name="identity_document_id"/>
+                                        <field name="product_id"/>
+                                        <field name="lot_id"/>
+                                        <field name="price_in"/>
+                                        <field name="date_out"/>
+                                        <field name="document_out"/>
+                                        <field name="price_out"/>
+                                        <field name="margin"/>
+                                        <field name="state"/>
+                                        <button name="signal_loaded" string="Load" icon="tick" type="object" states="draft"/>
+                                        <button name="signal_unloaded" string="Unload" icon="tick" type="object" states="loaded"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search: Goods Loading Register -->
+        <record model="ir.ui.view" id="goods_loading_register_search">
+            <field name="name">goods.loading.register.search</field>
+            <field name="model">goods.loading.register</field>
+            <field name="arch" type="xml">
+                <search string="Goods Loading Register Search View">
+                    <field name="name" string="Name"/>
+                    <filter name="open" string="Open Registers" domain="[('state', '=', 'draft')]"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action: Goods Loading Register -->
+        <record model="ir.actions.act_window" id="action_goods_loading_register">
+            <field name="name">Goods Loading Register</field>
+            <field name="res_model">goods.loading.register</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="goods_loading_register_search"/>
+            <field name="context">{'search_default_open': True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new register.
+                </p>
+            </field>
+        </record>
+
+        <!-- Tree: Goods Loading Register Line -->
+        <record model="ir.ui.view" id="goods_loading_register_line_tree">
+            <field name="name">goods.loading.register.line.tree</field>
+            <field name="model">goods.loading.register.line</field>
+            <field name="arch" type="xml">
+                <tree string="Goods Loading Register Line Tree">
+                    <field name="code"/>
+                    <field name="date_in"/>
+                    <field name="document_in"/>
+                    <field name="identity_document_id"/>
+                    <!-- <field name="move_in_id"/> -->
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="price_in"/>
+                    <field name="date_out"/>
+                    <field name="document_out"/>
+                    <field name="price_out"/>
+                    <!-- <field name="move_out_id"/> -->
+                    <field name="margin"/>
+                    <field name="state"/>
+                    <button name="signal_loaded" string="Load" icon="tick" type="object" states="draft"/>
+                    <button name="signal_unloaded" string="Unload" icon="tick" type="object" states="loaded"/>
+                    <button string="Reset Workflow" name="reset_workflow" type="object" groups="base.group_system,base.group_erp_manager" icon="gtk-refresh"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search: Goods Loading Register Line -->
+        <record model="ir.ui.view" id="goods_loading_register_line_search">
+            <field name="name">goods.loading.register.line.search</field>
+            <field name="model">goods.loading.register.line</field>
+            <field name="arch" type="xml">
+                <search string="Goods Loading Register Line Search View">
+                    <field name="lot_id"/>
+                    <field name="code"/>
+                    <field name="product_id"/>
+                    <field name="document_in"/>
+                    <field name="document_out"/>
+                    <field name="invoice_in_id"/>
+                    <field name="invoice_out_id"/>
+                    <filter name="loaded" string="Loaded" domain="[('state', '=', 'loaded')]"/>
+                    <filter name="unloaded" string="Unloaded" domain="[('state', '=', 'unloaded')]"/>
+
+                </search>
+            </field>
+        </record>
+
+        <!-- Action: Goods Loading Register -->
+        <record model="ir.actions.act_window" id="action_goods_loading_register_lines">
+            <field name="name">Goods Loading Register Lines</field>
+            <field name="res_model">goods.loading.register.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="goods_loading_register_line_search"/>
+            <field name="context">{'search_default_loaded': 1}</field>
+        </record>
+
+
+    </data>
+</openerp>

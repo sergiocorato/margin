@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard view -->
+        <record id="view_change_sale_order_tax_wizard_form" model="ir.ui.view">
+            <field name="name">change.sale.order.tax.wizard.view</field>
+            <field name="model">change.sale.order.tax.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Change Taxes On Sale Order Lines" version="7.0">
+                    <group>
+                        <field name="order_id"/>
+                        <field name="tax_ids" widget="many2many_tags"/>
+                    </group>
+                    <label for="order_line_ids"/>
+                    <field name="order_line_ids"/>
+                    <p class="help-text">You are updating taxes for the order lines specified above.</p>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_change_sale_order_tax_wizard" model="ir.actions.act_window">
+            <field name="name">Change Taxes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">change.sale.order.tax.wizard</field>
+            <field name="view_id" ref="view_change_sale_order_tax_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

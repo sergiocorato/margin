@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Tree: Kept Product To Return -->
+        <record model="ir.ui.view" id="kept_product_to_return_tree">
+            <field name="name">kept.product.to.return.tree</field>
+            <field name="model">kept.product.to.return</field>
+            <field name="arch" type="xml">
+                <tree string="Kept Product To Return Tree" create="0" colors="blue: state == 'to_account'; orange: state == 'partial_accounted';">
+                    <field name="product_to_return_id"/>
+                    <field name="type"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="product_qty"/>
+                    <field name="product_uom_id"/>
+                    <field name="date"/>
+                    <field name="notification_date_limit"/>
+                    <field name="price_total"/>
+                    <field name="notification_sent"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form: Kept Product To Return -->
+        <record model="ir.ui.view" id="kept_product_to_return_form">
+            <field name="name">kept.product.to.return.form</field>
+            <field name="model">kept.product.to.return</field>
+            <field name="arch" type="xml">
+                <form string="Kept Product To Return Form" version="7.0" create="0">
+                    <header>
+                        <button name="action_notification_send" string="Notify By Email" type="object" attrs="{'invisible': ['|', ('type', '!=', 'incoming'), ('notification_sent', '=', True)]}" class="oe_highlight"/>
+                        <button name="action_notification_send" string="Notify By Email" type="object" attrs="{'invisible': ['|', ('type', '!=', 'incoming'), ('notification_sent', '=', False)]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <field name="warning_message" widget="form_warnings" options="{'fixed': 'top'}"/>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="product_to_return_id"/></h1>
+
+                        </div>
+
+                        <div class="oe_right oe_button_box">
+                            <!-- buttons here -->
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="type"/>
+                                <field name="product_id"/>
+                                <field name="product_qty"/>
+                                <field name="product_uom_id"/>
+                                <field name="left_amount"/>
+                                <field name="notification_sent"/>
+                            </group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="date"/>
+                                <field name="notification_date_limit"/>
+                                <field name="price_unit"/>
+                                <field name="price_total"/>
+                                <field name="reason"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+
+                            <page string="Accounting" groups="account.group_account_user">
+                                <label for="invoice_line_ids"/>
+                                <field name="invoice_line_ids" readonly="1">
+                                    <tree colors="blue:invoice_state == 'draft'; gray:invoice_state == 'cancel'">
+                                        <field name="invoice_id"/>
+                                        <field name="name"/>
+                                        <field name="account_id"/>
+                                        <field name="quantity"/>
+                                        <field name="uos_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="discount"/>
+                                        <field name="invoice_line_tax_id" widget="many2many_tags"/>
+                                        <field name="price_subtotal" sum="Total Amount"/>
+                                        <field name="invoice_state"/>
+                                    </tree>
+                                </field>
+                                <label for="receipt_line_ids"/>
+                                <field name="receipt_line_ids" readonly="1">
+                                    <tree colors="blue:voucher_state == 'draft'; gray:voucher_state == 'cancel'">
+                                        <field name="voucher_number"/>
+                                        <field name="account_id"/>
+                                        <field name="amount" sum="Total Amount"/>
+                                        <field name="voucher_state"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <page string="Check Bypass" groups="techplus_base.group_check_bypass_user">
+                                <button name="%(techplus_base.action_check_bypass_wizard)d" type="action" string="New Bypass" attrs="{'invisible': [('state', 'not in', ('to_account', 'partial_accounted'))]}" class="oe_highlight"/>
+                                <button name="%(techplus_base.action_edit_check_bypass_wizard)d" type="action" string="Edit Bypass"/>
+                                <field name="check_bypass_ids">
+                                    <tree create="0" edit="0" delete="0">
+                                        <field name="object_id"/>
+                                        <field name="user_id"/>
+                                        <field name="bypass_datetime"/>
+                                        <field name="check_code"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search: Kept Product To Return -->
+        <record model="ir.ui.view" id="kept_product_to_return_search">
+            <field name="name">kept.product.to.return.search</field>
+            <field name="model">kept.product.to.return</field>
+            <field name="arch" type="xml">
+                <search string="Kept Product To Return Search View">
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="product_to_return_id"/>
+                    <field name="partner_id"/>
+                    <field name="date" filter_domain="[('date','&lt;=',self)]" string="Date Before"/>
+                    <field name="date" filter_domain="[('date','&gt;=',self)]" string="Date After"/>
+                    <field name="state"/>
+                    <field name="reason"/>
+                    <filter name="outgoing" string="To sell" domain="[('type', '=', 'outgoing'), ('state', '!=', 'accounted')]"/>
+                    <filter name="incoming" string="To buy" domain="[('type', '=', 'incoming'), ('state', '!=', 'accounted')]"/>
+                    <filter name="accounted_outgoing" string="Sold" domain="[('type', '=', 'outgoing'), ('state', '=', 'accounted')]"/>
+                    <filter name="accounted_incoming" string="Buyed" domain="[('type', '=', 'incoming'), ('state', '=', 'accounted')]"/>
+                    <separator/>
+                    <filter name="opened" string="Opened" domain="[('state', 'in', ('to_account', 'partial_accounted'))]"/>
+                    <separator/>
+                    <filter name="to_notify_within_30_days" string="To notify within 30 days" domain="[('notification_date_limit', '&lt;=', (context_today()+datetime.timedelta(30)).strftime('%%Y-%%m-%%d')), ('notification_date_limit', '&gt;=', context_today().strftime('%%Y-%%m-%%d')), ('type', '=', 'in'), ('state', '=', 'to_account'), ('notification_sent', '=', False)]"/>
+                    <filter name="notification_day_limit_exceeded" string="Notification day limit exceeded" domain="[('notification_date_limit', '&lt;=', context_today().strftime('%%Y-%%m-%%d')), ('type', '=', 'in'), ('state', '=', 'to_account'), ('notification_sent', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action: Kept Product To Return -->
+        <record model="ir.actions.act_window" id="action_kept_product_to_return">
+            <field name="name">Kept Product To Return</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="kept_product_to_return_search"/>
+            <field name="context">{'search_default_opened': 1,}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new kept product to return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Kept Product To Return (To Notify Within 30 Days) -->
+        <record model="ir.actions.act_window" id="action_kept_product_to_return_to_notifiy_within_30_days">
+            <field name="name">Kept Product To Return To Notify Within 30 Days</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="kept_product_to_return_search"/>
+            <field name="context">{'search_default_to_notify_within_30_days': 1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new kept product to return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Kept Product To Return (Notification day limit exceeded) -->
+        <record model="ir.actions.act_window" id="action_kept_product_to_return_notification_day_limit_exceeded">
+            <field name="name">Kept Product To Return Having Notification Day Limit Exceeded</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="kept_product_to_return_search"/>
+            <field name="context">{'search_default_notification_day_limit_exceeded': 1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new kept product to return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Kept Product To Return (Supplied Products To Invoice) -->
+        <record model="ir.actions.act_window" id="action_supplied_kept_product_to_return_to_invoice">
+            <field name="name">Supplied Kept Product To Return To Invoice</field>
+            <field name="res_model">kept.product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="kept_product_to_return_search"/>
+            <field name="context">{'search_default_outgoing': 1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new kept product to return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Tree: Product To Return -->
+        <record model="ir.ui.view" id="product_to_return_tree">
+            <field name="name">product.to.return.tree</field>
+            <field name="model">product.to.return</field>
+            <field name="arch" type="xml">
+                <tree string="Product To Return Tree" colors="grey: return_completed == True; orange: type == 'incoming'; blue: type == 'outgoing';">
+                    <field name="reason"/>
+                    <field name="type"/>
+                    <field name="partner_from_id"/>
+                    <field name="name"/>
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="product_qty"/>
+                    <field name="unknown_fate_quantity"/>
+                    <field name="return_planned_quantity"/>
+                    <field name="return_done_quantity"/>
+                    <field name="kept_quantity"/>
+                    <field name="product_uom_id"/>
+                    <field name="return_date"/>
+                    <field name="return_completed" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form: Product To Return -->
+        <record model="ir.ui.view" id="product_to_return_form">
+            <field name="name">product.to.return.form</field>
+            <field name="model">product.to.return</field>
+            <field name="arch" type="xml">
+                <form string="Product To Return Form" version="7.0">
+                    <header>
+                        <field name="state" widget="statusbar" invisible="1"/>
+                    </header>
+                    <sheet>
+
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name"/></h1>
+                            <label for="product_id"/>
+                            <h2><field name="product_id"/></h2>
+                            <label for="lot_id"/>
+                            <h3><field name="lot_id"/></h3>
+                            <field name="type" invisible="1"/>
+                            <label for="partner_from_id" string="Return To" attrs="{'invisible': [('type', '!=', 'outgoing')]}"/>
+                            <label for="partner_from_id" string="Return From" attrs="{'invisible': [('type', '!=', 'incoming')]}"/>
+                            <h3><field name="partner_from_id"/></h3>
+                        </div>
+
+                        <div class="oe_right oe_button_box">
+                            <!-- <button name="%(action_kept_product_to_return_wizard)d" string="Keep" type="action" class="oe_highlight"/> -->
+                            <button name="keep" string="Keep" type="object" class="oe_highlight"/>
+                            <button name="%(action_return_product_to_return_wizard)d" string="Return" type="action" class="oe_highlight"/>
+                        </div>
+
+                        <group>
+                            <group string="Move From">
+                                <field name="reason"/>
+                                <field name="move_from_id"/>
+                                <field name="date"/>
+                                <field name="picking_from_id"/>
+                                <field name="return_date"/>
+                                <field name="product_qty"/>
+                                <field name="unknown_fate_quantity"/>
+                                <field name="return_planned_quantity"/>
+                                <field name="return_done_quantity"/>
+                                <field name="kept_quantity"/>
+                                <field name="product_uom_id"/>
+                            </group>
+                            <group string="Move To">
+                                <field name="move_return_ids" nolabel="1">
+                                    <tree colors="gray: state == 'cancel';blue: state in ('waiting','confirmed','assigned');green: state == 'done';">
+                                        <field name="date"/>
+                                        <field name="product_qty" sum="Total Returned"/>
+                                        <field name="product_uom"/>
+                                        <field name="picking_id"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group string="Kept Products">
+                                <field name="kept_product_to_return_ids" nolabel="1">
+                                    <tree>
+                                        <field name="date"/>
+                                        <field name="product_qty" sum="Total Kept"/>
+                                        <field name="product_uom_id"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Notes">
+                                <field name="notes"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search: Product To Return -->
+        <record model="ir.ui.view" id="product_to_return_search">
+            <field name="name">product.to.return.search</field>
+            <field name="model">product.to.return</field>
+            <field name="arch" type="xml">
+                <search string="Product To Return Search View">
+                    <field name="name"/>
+                    <field name="partner_from_id"/>
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="type"/>
+                    <field name="reason"/>
+                    <field name="return_plan_completed"/>
+                    <field name="return_completed"/>
+                    <field name="return_date" filter_domain="[('return_date','&lt;=',self)]" string="Return Before"/>
+                    <field name="return_date" filter_domain="[('return_date','&gt;=',self)]" string="Return After"/>
+                    <filter name="return_date_expired" domain="[('return_date', '&lt;', (context_today()+datetime.timedelta(0)).strftime('%%Y-%%m-%%d'))]" string="Return Expired"/>
+                    <separator/>
+                    <filter name="type_incoming" domain="[('type', '=', 'incoming')]" string="Received"/>
+                    <separator/>
+                    <filter name="type_outgoing" domain="[('type', '=', 'outgoing')]" string="Delivered"/>
+                    <separator/>
+                    <filter name="to_return" domain="[('return_completed', '=', False)]" string="Waiting to be returned"/>
+                    <separator/>
+                    <filter name="return_plan_completed" domain="[('return_plan_completed', '=', True)]" string="Return plan completed"/>
+                    <separator/>
+                    <filter name="to_return_within_30_days" string="To return within 30 days" domain="[('return_date', '&lt;=', (context_today()+datetime.timedelta(30)).strftime('%%Y-%%m-%%d')), ('return_date', '&gt;=', context_today().strftime('%%Y-%%m-%%d')), ('return_completed', '=', False)]"/>
+                    <filter name="return_day_limit_exceeded" string="Return day limit exceeded" domain="[('return_date', '&lt;=', context_today().strftime('%%Y-%%m-%%d')), ('return_completed', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action: Product To Return -->
+        <record model="ir.actions.act_window" id="action_product_to_return">
+            <field name="name">Products To Return</field>
+            <field name="res_model">product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="product_to_return_tree"/>
+            <field name="search_view_id" ref="product_to_return_search"/>
+            <field name="context">{'search_default_to_return': True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new Product To Return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Product To Return (Supplied Products To Be Returned Within 30 Days) -->
+        <record model="ir.actions.act_window" id="action_supplied_product_to_return_to_return_within_30_days">
+            <field name="name">Supplied Products To Be Returned Within 30 Days</field>
+            <field name="res_model">product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="product_to_return_tree"/>
+            <field name="search_view_id" ref="product_to_return_search"/>
+            <field name="context">{'search_default_to_return_within_30_days': True, 'search_default_type_outgoing': True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new Product To Return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Product To Return (Supplied Products That Must Be Returned) -->
+        <record model="ir.actions.act_window" id="action_supplied_product_to_return_that_must_be_returned">
+            <field name="name">Supplied Products That Must Be Returned</field>
+            <field name="res_model">product.to.return</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="product_to_return_tree"/>
+            <field name="search_view_id" ref="product_to_return_search"/>
+            <field name="context">{'search_default_return_day_limit_exceeded': True, 'search_default_type_outgoing': True}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new Product To Return.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: Create Return Pickings -->
+        <record id="action_create_return_pickings" model="ir.actions.server">
+            <field name="name">Create Return Pickings</field>
+            <field name="condition">True</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_product_to_return" />
+            <field name="state">code</field>
+            <field name="code">pool.get('product.to.return').create_return_pickings(cr, uid, context=context)</field>
+        </record>
+
+        <record model="ir.values" id="create_return_pickings">
+            <field name="name">Create Return Pickings</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.server,' + str(ref('action_create_return_pickings'))" />
+            <field name="key">action</field>
+            <field name="model">product.to.return</field>
+        </record>
+
+    </data>
+</openerp>

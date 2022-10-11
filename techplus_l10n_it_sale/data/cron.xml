@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record model="ir.cron" id="cancel_quotations_cron">
+            <field name="name">Cancel Quotations</field>
+            <field name="active" eval="False"/>
+            <!--<field name="user_id">0</field>-->
+            <field name="interval_number">1</field>
+            <!-- interval_type: minutes, hours, work_days, days, weeks, months. -->
+            <field name="interval_type">days</field>
+            <!-- numbercall: how many times the method is called (-1 = no limit). -->
+            <field name="numbercall">-1</field>
+            <!-- doall: True if missed occurrences should be executed when the server restarts. -->
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'sale.order'"/>
+            <field name="function" eval="'set_to_cancel_quotations'"/>
+            <field name="args" eval="'(True,)'"/>
+        </record>
+
+        <record model="ir.cron" id="create_return_pickings_cron">
+            <field name="name">Create Return Pickings</field>
+            <field name="active" eval="False"/>
+            <!--<field name="user_id">0</field>-->
+            <field name="interval_number">1</field>
+            <!-- interval_type: minutes, hours, work_days, days, weeks, months. -->
+            <field name="interval_type">days</field>
+            <!-- numbercall: how many times the method is called (-1 = no limit). -->
+            <field name="numbercall">-1</field>
+            <!-- doall: True if missed occurrences should be executed when the server restarts. -->
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'product.to.return'"/>
+            <field name="function" eval="'create_return_pickings'"/>
+            <field name="args" eval="'(None, 0)'"/>
+        </record>
+
+        <record model="ir.cron" id="lot_locks_update_cron">
+            <field name="name">Lot Locks Update</field>
+            <field name="active" eval="True"/>
+            <!--<field name="user_id">0</field>-->
+            <field name="interval_number">1</field>
+            <!-- interval_type: minutes, hours, work_days, days, weeks, months. -->
+            <field name="interval_type">hours</field>
+            <!-- numbercall: how many times the method is called (-1 = no limit). -->
+            <field name="numbercall">-1</field>
+            <!-- doall: True if missed occurrences should be executed when the server restarts. -->
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'stock.production.lot.lock'"/>
+            <field name="function" eval="'update'"/>
+            <field name="args" eval="'()'"/>
+        </record>
+
+        <!-- Product To Return -->
+        <record model="ir.cron" id="product_to_return_warning_mail_messages_cron">
+            <field name="name">Warning mail messages for product to return</field>
+            <field name="active" eval="True"/>
+            <!--<field name="user_id">0</field>-->
+            <field name="interval_number">1</field>
+            <!-- interval_type: minutes, hours, work_days, days, weeks, months. -->
+            <field name="interval_type">days</field>
+            <!-- numbercall: how many times the method is called (-1 = no limit). -->
+            <field name="numbercall">-1</field>
+            <!-- doall: True if missed occurrences should be executed when the server restarts. -->
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'product.to.return'"/>
+            <field name="function" eval="'update_warnings'"/>
+            <field name="args" eval="'()'"/>
+        </record>
+
+        <!-- Kept Product To Return -->
+        <record model="ir.cron" id="kept_product_to_return_warning_mail_messages_cron">
+            <field name="name">Warning mail messages for kept product to return</field>
+            <field name="active" eval="True"/>
+            <!--<field name="user_id">0</field>-->
+            <field name="interval_number">1</field>
+            <!-- interval_type: minutes, hours, work_days, days, weeks, months. -->
+            <field name="interval_type">days</field>
+            <!-- numbercall: how many times the method is called (-1 = no limit). -->
+            <field name="numbercall">-1</field>
+            <!-- doall: True if missed occurrences should be executed when the server restarts. -->
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'kept.product.to.return'"/>
+            <field name="function" eval="'update_warnings'"/>
+            <field name="args" eval="'()'"/>
+        </record>
+
+    </data>
+</openerp>

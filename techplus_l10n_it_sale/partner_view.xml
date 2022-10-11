@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_partner_form_inherit_shipping_conditions">
+            <field name="name">partner.form.shipping.conditions</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <page string="Sales &amp; Purchases" position="inside">
+                    <group colspan="2" col="2" groups="base.group_sale_salesman">
+                        <separator string="Default shipping conditions" colspan="2"/>
+                        <field name="carriage_condition_id" groups="base.group_sale_salesman"/>
+                        <field name="goods_description_id" groups="base.group_sale_salesman"/>
+                        <field name="transportation_reason_id" groups="base.group_sale_salesman"/>
+                        <field name="transportation_id" groups="base.group_sale_salesman"/>
+                    </group>
+                </page>
+                <xpath expr="sheet/notebook/page/group/group/field[@name='supplier']" position="after">
+                    <field name="carrier"/>
+                    <field name="carrier_register_number" attrs="{'invisible':[('carrier', '=', False)]}"/>
+                </xpath>
+                <field name="ref" position="before">
+                    <field name="delivery_notes"/>
+                </field>
+
+                <xpath expr="//sheet/div[@name='buttons']" position="inside">
+                    <button name="view_pickings_to_invoice" string="Picking To Invoice" type="object" groups="account.group_account_user"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Action: Carrier -->
+        <record model="ir.actions.act_window" id="action_view_carriers">
+            <field name="name">Carriers</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('carrier','=', True)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new carrier.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+
+

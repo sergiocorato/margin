@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- TODELETE: BEGIN -->
+
+        <!-- Config -->
+        <menuitem id="menu_l10n_it_sale_config" name="l10n IT Sale" parent="techplus_base.menu_techplus" sequence="300" action="action_l10n_it_sale_settings"/>
+        <menuitem id="menu_l10n_it_sale_fix_product_to_return_wizard" name="Fix Product To Return Wizard" parent="techplus_base.menu_techplus" sequence="305" action="action_fix_product_to_return_wizard"/>
+
+        <!-- <menuitem id="menu_l10n_it_sale_migrate_ddt" name="Migrate DDT" parent="techplus_base.menu_techplus" sequence="300" action="action_migrate_ddt"/> -->
+
+        <!-- TODELETE: END -->
+
+        <!-- ACCOUNT -->
+        <menuitem
+            id="menu_registers_menu"
+            name="Registers"
+            parent="account.menu_finance"
+            sequence="3"
+        />
+        <menuitem
+            name="Goods Load/Unload Registers"
+            id="menu_goods_loading_registers"
+            action="action_goods_loading_register"
+            parent="menu_registers_menu"
+            sequence="10"
+        />
+        <menuitem
+            name="Goods Load/Unload Register Lines"
+            id="menu_goods_loading_register_lines"
+            action="action_goods_loading_register_lines"
+            parent="menu_registers_menu"
+            sequence="20"
+            groups="account.group_account_user"
+        />
+
+        <menuitem
+            name="Custom Export Notifications"
+            id="menu_custom_export_notification"
+            action="action_custom_export_notification"
+            parent="menu_registers_menu"
+            sequence="60"
+            groups="techplus_l10n_it_sale.group_extra_ue_invoices"
+        />
+
+        <!-- Invoicing Utility -->
+        <menuitem
+            id="menu_invoicing_utility_menu"
+            name="Invoicing Utility"
+            parent="account.menu_finance"
+            sequence="3"
+        />
+        <menuitem
+            name="Out Pickings To Invoice"
+            id="menu_out_pickings_to_invoice"
+            action="action_stock_picking_out_to_invoice"
+            parent="menu_invoicing_utility_menu"
+            sequence="10"
+        />
+
+        <menuitem
+            name="Sale Orders To Invoice"
+            id="menu_sale_orders_to_invoice"
+            action="action_sale_order_to_invoice"
+            parent="menu_invoicing_utility_menu"
+            sequence="15"
+        />
+
+        <menuitem
+            name="Picking In To Refund"
+            id="menu_picking_in_to_invoice"
+            action="action_stock_picking_in_to_refund"
+            parent="menu_invoicing_utility_menu"
+            sequence="20"
+        />
+
+        <!-- kept Product To Return -->
+        <menuitem
+            id="menu_kept_product_to_return_menu"
+            name="Kept Products"
+            parent="account.menu_finance"
+            sequence="3"
+        />
+        <menuitem
+            name="To Notify Within 30 Days"
+            id="menu_kept_products_to_notify_within_30_days"
+            action="action_kept_product_to_return_to_notifiy_within_30_days"
+            parent="menu_kept_product_to_return_menu"
+            sequence="15"
+        />
+        <menuitem
+            name="Notification day limit exceeded"
+            id="menu_kept_product_to_return_notification_day_limit_exceeded"
+            action="action_kept_product_to_return_notification_day_limit_exceeded"
+            parent="menu_kept_product_to_return_menu"
+            sequence="20"
+        />
+        <menuitem
+            name="Supplied Products To Invoice"
+            id="menu_supplied_kept_product_to_return_to_invoice"
+            action="action_supplied_kept_product_to_return_to_invoice"
+            parent="menu_kept_product_to_return_menu"
+            sequence="40"
+        />
+
+
+        <!-- Supplied Product To Return -->
+        <menuitem
+            id="menu_supplied_product_to_return_menu"
+            name="Supplied Product To Return"
+            parent="account.menu_finance"
+            sequence="3"
+        />
+        <menuitem
+            name="To Be Returned Within 30 Days"
+            id="menu_products_to_notify_within_30_days"
+            action="action_supplied_product_to_return_to_return_within_30_days"
+            parent="menu_supplied_product_to_return_menu"
+            sequence="10"
+        />
+        <menuitem
+            name="Return day limit exceeded"
+            id="menu_product_to_return_notification_day_limit_exceeded"
+            action="action_supplied_product_to_return_that_must_be_returned"
+            parent="menu_supplied_product_to_return_menu"
+            sequence="20"
+        />
+
+        <!-- Menu Stock -->
+        <menuitem name="Delivery" id="menu_delivery" parent="stock.menu_stock_root" sequence="3" />
+        <menuitem id="menu_transport_documents" name="Transport Documents" parent="menu_delivery" sequence="10" action="action_transport_documents"/>
+        <menuitem id="menu_carriers" name="Carriers" parent="menu_delivery" sequence="20" action="action_view_carriers"/>
+        <menuitem id="menu_products_to_return" name="Products To Return" parent="menu_delivery" sequence="30" action="action_product_to_return"/>
+        <menuitem id="menu_kept_products_to_return" name="Kept Products To Return" parent="menu_delivery" sequence="40" action="action_kept_product_to_return" groups="account.group_account_user"/>
+
+        <menuitem action="action_transportation_reason_tree" id="menu_action_transportation_reason_tree" parent="stock.menu_stock_configuration"/>
+        <menuitem action="action_goods_description_tree" id="menu_action_good_description_tree" parent="stock.menu_stock_configuration"/>
+        <menuitem action="action_carriage_condition_tree" id="menu_action_carriage_condition_tree" parent="stock.menu_stock_configuration"/>
+        <menuitem action="stock.action_incoterms_tree" id="menu_action_incoterms_tree" parent="stock.menu_stock_configuration"/>
+
+        <menuitem id="menu_stock_utilities" name="Stock Utilities" parent="stock.menu_stock_root" sequence="10"/>
+        <menuitem id="menu_check_stock_move_lot_and_product_integrity_wizard" name="Check Lot Integrity On Stock Moves Wizard" parent="menu_stock_utilities" sequence="10" action="action_check_stock_move_lot_and_product_integrity_wizard"/>
+
+        <!-- Menu Sale -->
+
+        <menuitem name="Lot Locks" id="menu_lot_locks" parent="base.menu_product" action="action_stock_production_lot_lock" sequence="100" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+
+        <menuitem name="Update All Sale Order Contents HTML" id="menu_update_all_sale_order_contents_html_wizard" parent="techplus_base.menu_techplus" action="action_update_all_sale_order_contents_html_wizard" sequence="100" groups="base.group_system,base.group_erp_manager"/>
+
+        <menuitem name="Product replace wizard" id="menu_product_replace_wizard" parent="base.menu_product" action="action_product_replace_wizard" sequence="9998" />
+
+
+    </data>
+</openerp>

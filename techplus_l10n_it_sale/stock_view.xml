@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Form: Warehouse -->
+        <record id="view_warehouse_form" model="ir.ui.view">
+            <field name="name">stock.warehouse.form</field>
+            <field name="model">stock.warehouse</field>
+            <field name="inherit_id" ref="stock.view_warehouse"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/group" position="after">
+                    <group>
+                        <field name="lot_lock_location_id"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Form: Stock Inventory -->
+        <record id="view_inventory_form" model="ir.ui.view">
+            <field name="name">stock.inventory.form</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div/button[@string='Fill Inventory']" position="after">
+                    <button name="%(action_import_inventory_lines_wizard)d" states="draft" string="Import from CSV" type="action"/>
+                </xpath>
+
+                <xpath expr="/form/sheet" position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Tree: Stock Picking In -->
+        <record id="view_picking_in_tree" model="ir.ui.view">
+            <field name="name">stock.picking.in.tree</field>
+            <field name="model">stock.picking.in</field>
+            <field name="inherit_id" ref="stock.view_picking_in_tree"/>
+            <field name="arch" type="xml">
+
+
+                <field name="min_date" position="after">
+                    <field name="contents_html" widget="html"/>
+                </field>
+
+            </field>
+        </record>
+
+        <!-- Form: Stock Picking In -->
+        <record id="view_picking_form" model="ir.ui.view">
+            <field name="name">stock.picking.in.form</field>
+            <field name="model">stock.picking.in</field>
+            <field name="inherit_id" ref="techplus_stock_invoice_picking.stock_picking_invoice_in_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="domain">[]</attribute>
+                </xpath>
+
+                <field name="origin" position="after">
+                    <field name="purchase_id" readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
+                    <field name="ddt_number"/>
+                    <field name="ddt_date"/>
+                </field>
+
+                <field name="state" position="before">
+                    <button name="%(action_set_reason_on_picking_moves_wizard)d" string="Set causal" type="action"/>
+                    <button name="%(action_stock_picking_in_split_lines_wizard)d" string="Split picking" type="action"/>
+                </field>
+
+            </field>
+        </record>
+
+        <!-- Tree: Stock Picking Out -->
+        <record id="view_picking_out_tree" model="ir.ui.view">
+            <field name="name">stock.picking.out.tree</field>
+            <field name="model">stock.picking.out</field>
+            <field name="inherit_id" ref="stock.view_picking_out_tree"/>
+            <field name="arch" type="xml">
+
+                <field name="name" position="before">
+                    <field name="transport_document_id" invisible="1"/>
+                    <field name="shipping_invoice_id" invisible="1"/>
+                    <field name="shipping_document_ref"/>
+                </field>
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Shipping Address</attribute>
+                    <attribute name="context">{'show_address': 1}</attribute>
+                    <attribute name="options">{'always_reload': True, 'highlight_first_line': True}</attribute>
+                </field>
+                <field name="partner_id" position="before">
+                    <field name="customer_id" context="{'show_address': 1}" options='{"always_reload": True}'/>
+                </field>
+
+                <field name="min_date" position="after">
+                    <field name="contents_html" widget="html"/>
+                </field>
+
+            </field>
+        </record>
+
+
+        <!-- Form: Stock Picking Out -->
+        <record id="stock_picking_form_ddt_inherit" model="ir.ui.view">
+            <field name="name">stock.picking.form.ddt.inherit</field>
+            <field name="model">stock.picking.out</field>
+            <field name="inherit_id" ref="stock.view_picking_out_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//h1/field[@name='name']/.." position="after">
+                    <div name="sale_info" attrs="{'invisible': [('sale_id', '=', False)]}">
+                        <label for="sale_id"/>
+                        <h3><field name="sale_id" readonly="1"/></h3>
+                    </div>
+                </xpath>
+
+                <field name="min_date" position="after">
+                    <field name="carriage_condition_id"/>
+                </field>
+
+                <field name="state" position="before">
+                    <button name="%(action_set_reason_on_picking_moves_wizard)d" states="draft,auto,confirmed,assigned,cancel" string="Set transportation reason" type="action"/>
+                    <button name="%(action_transport_document_wizard)d" string="Create Transport Document" type="action" class="oe_highlight" attrs="{'invisible': ['|', ('transport_document_id', '!=', False), ('state', '!=', 'done')]}"/>
+                    <button name="%(action_stock_picking_out_split_margin_scheme_lines)d" string="Split by Margin Scheme" type="action"/>
+                </field>
+
+                <xpath expr="//field[@name='move_lines']" position="after">
+                    <group class="oe_subtotal_footer oe_left" colspan="2" attrs="{'invisible': [('sale_id', '=', False)]}" groups="base.group_sale_manager">
+                        <field name="goods_dropped_value_lines" attrs="{'invisible': [('goods_dropped_value_lines', '=', 0)]}"/>
+                        <field name="currency_id" invisible="1"/>
+                        <label for="goods_value"/>
+                        <field name="goods_value" nolabel="1" class="oe_subtotal_footer_separator" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                    <separator/>
+                </xpath>
+
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Destination</attribute>
+                    <attribute name="domain">[]</attribute>
+                    <attribute name="on_change">on_change_partner_id(partner_id, context)</attribute>
+                    <attribute name="context">{'show_address': 1}</attribute>
+                    <attribute name="options">{'always_reload': True, 'highlight_first_line': True}</attribute>
+                </field>
+                <field name="partner_id" position="before">
+                    <field name="customer_id" context="{'show_address': 1}" options='{"always_reload": True}'/>
+                </field>
+
+                <field name="backorder_id" position="after">
+                    <field name="transport_document_id" attrs="{'invisible': [('transport_document_id','=',False)]}"/>
+                    <field name="shipping_invoice_id" attrs="{'invisible': [('shipping_invoice_id','=',False)]}"/>
+                </field>
+
+                <xpath expr="//field[@name='note']" position="replace"/>
+
+                <xpath expr="//notebook" position="before">
+                    <div name="notes">
+                        <label for="note" string="Internal Notes"/>
+                        <field name="note" placeholder="Add an internal note..." widget="warningtext"/>
+                        <label for="shipping_notes" string="Shipping Notes"/>
+                        <field name="shipping_notes" placeholder="Add shipping notes..." widget="helptext"/>
+                    </div>
+                </xpath>
+
+                <field name="min_date" position="before">
+                    <field name="partner_delivery_notes" attrs="{'invisible': [('partner_delivery_notes', '=', False)]}"/>
+                </field>
+
+            </field>
+        </record>
+
+        <!-- Search: Stock Picking Out -->
+        <record id="view_picking_out_search" model="ir.ui.view">
+            <field name="name">stock.picking.out.search</field>
+            <field name="model">stock.picking.out</field>
+            <field name="inherit_id" ref="stock.view_picking_out_search"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="replace">
+                    <field name="customer_id"/>
+                    <field name="partner_id" string="Destination"/>
+                </field>
+                <field name="partner_id" position="after">
+                    <field name="shipping_document_ref"/>
+                </field>
+                <xpath expr="//filter[@string='Status']" position="before">
+                    <filter string="Shipping Document" domain="[]" context="{'group_by':'shipping_document_ref'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Form: Stock Picking -->
+        <record id="view_picking_form_inherit" model="ir.ui.view">
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+             <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Destination</attribute>
+                </field>
+                <field name="partner_id" position="before">
+                    <field name="customer_id"/>
+                </field>
+
+                <field name="backorder_id" position="after">
+                    <field name="transport_document_id" attrs="{'invisible': [('transport_document_id','=',False)]}"/>
+                    <field name="shipping_invoice_id" attrs="{'invisible': [('shipping_invoice_id','=',False)]}"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Tree: Production Lot -->
+        <record model="ir.ui.view" id="view_production_lot_tree">
+            <field name="name">stock.production.lot.tree.profile</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+            <field name="arch" type="xml">
+                <field name="stock_available" position="replace">
+                    <field name="unlocked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                    <field name="locked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                    <field name="stock_available" string="In Stock"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Tree: Production Lot (Search Popup Tree View) -->
+        <record model="ir.ui.view" id="view_production_lot_search_popup_tree">
+            <field name="name">stock.production.lot.tree</field>
+            <field name="model">stock.production.lot</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree string="Production Lot Tree" colors="red:stock_available == 0;">
+                    <field name="name"/>
+                    <field name="ref"/>
+                    <field name="unlocked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                    <field name="locked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                    <field name="stock_available" string="In Stock"/>
+                    <field name="purchase_mode"/>
+                    <field name="date"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form: Production Lot -->
+        <record model="ir.ui.view" id="view_production_lot_form">
+            <field name="name">stock.production.lot.form.profile</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_form" />
+            <field name="arch" type="xml">
+
+                <field name="product_id" position="after">
+                    <field name="purchase_mode"/>
+                    <field name="goods_loading_register_code" attrs="{'invisible': [('goods_loading_register_code', '=', False)]}"/>
+                </field>
+
+                <xpath expr="//group/field[@name='stock_available']" position="attributes">
+                    <attribute name="string">In Stock</attribute>
+                </xpath>
+
+                <xpath expr="//group/field[@name='stock_available']" position="after">
+                    <field name="product_to_return_info" widget="rawtext"/>
+                </xpath>
+                <xpath expr="//page/field[@name='move_ids']/tree/field[@name='tracking_id']" position="after">
+                    <field name="transportation_reason"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[last()]" position="after">
+                    <page string="Locks" groups="techplus_l10n_it_sale.group_lot_lock_user">
+                        <group>
+                            <group>
+                                <field name="locked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                            </group>
+                            <group>
+                                <field name="unlocked_quantity" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                            </group>
+                        </group>
+                        <field name="active_lock_ids" groups="techplus_l10n_it_sale.group_lot_lock_user">
+                            <tree>
+                                <field name="sale_order_id"/>
+                                <field name="sale_order_partner_id"/>
+                                <field name="stock_picking_out_id"/>
+                                <field name="stock_picking_partner_id"/>
+                                <field name="begin_time"/>
+                                <field name="expiration_time"/>
+                                <field name="lock_reason"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Tree: Stock Picking Move Lines -->
+        <record id="view_move_picking_tree" model="ir.ui.view">
+            <field name="name">stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+            <field name="arch" type="xml">
+                <field name="prodlot_id" position="before">
+                    <field name="transportation_reason" string="Reason"/>
+                    <field name="return_date" attrs="{'required': [('transportation_reason', 'in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment'))], 'invisible': [('transportation_reason', 'not in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment', 'sale_mandate'))]}"/>
+                    <field name="note"/>
+                    <button name="%(action_edit_stock_move_notes_wizard)d" string="Change Notes" type="action" icon="page_white_edit"/>
+                </field>
+                <field name="prodlot_id" position="after">
+                    <field name="type" invisible="1"/>
+                    <field name="lot_lock_id" widget="has_value" groups="techplus_l10n_it_sale.group_lot_lock_user" attrs="{'invisible': [('type','!=','out')]}"/>
+                    <button name="%(action_lot_lock_create_wizard)d" string="New Lot Lock" type="action" icon="lock_add" groups="techplus_l10n_it_sale.group_lot_lock_manager" attrs="{'invisible': ['|',('lot_lock_id', '!=', False),('type','!=','out')]}"/>
+                    <button name="%(action_lot_lock_disable_wizard)d" string="Disable Lot Lock" type="action" icon="lock_delete" groups="techplus_l10n_it_sale.group_lot_lock_manager" attrs="{'invisible': [('lot_lock_id', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Form: Stock Move Picking Form -->
+        <record id="view_move_picking_form" model="ir.ui.view">
+            <field name="name">stock.move.form</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/group/field[@name='name']" position="replace">
+                </xpath>
+                <xpath expr="//group/group/field[@name='product_id']" position="after">
+                    <field name="name"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="lot_lock_id" widget="has_value" groups="techplus_l10n_it_sale.group_lot_lock_manager" options="{'on_click_popup': 1}"/>
+                    <field name="transportation_reason"/>
+                    <label for="return_date"/>
+                    <div>
+                    <field name="return_date" attrs="{'required': [('transportation_reason', 'in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment'))], 'invisible': [('transportation_reason', 'not in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment', 'sale_mandate'))]}" readonly="0" class="oe_inline"/>
+                    <button name="%(action_change_move_return_date_wizard)d" states="done" string="Change Date" type="action"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='date']" position="before">
+                    <field name="note"/>
+                </xpath>
+                <xpath expr="//field[@name='date']/../.." position="before">
+                    <div class="oe_clear">
+                        <button name="%(action_edit_stock_move_notes_wizard)d" string="Edit Notes" type="action" icon="page_white_edit" class="oe_right"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Form: Stock Move -->
+        <record id="view_move_form" model="ir.ui.view">
+            <field name="name">stock.move.form</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="sale_stock.stock_move_sale"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='sale_line_id']" position="after">
+                    <field name="transportation_reason"/>
+                    <label for="return_date"/>
+                    <div>
+                        <field name="return_date" attrs="{'required': [('transportation_reason', 'in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment'))], 'invisible': [('transportation_reason', 'not in', ('loan', 'sale_or_return', 'sale_on_consignment', 'repair', 'tolling', 'on_consignment'))]}" readonly="0" class="oe_inline"/>
+                        <button name="%(action_change_move_return_date_wizard)d" string="Change Date" type="action"/>
+                    </div>
+                </xpath>
+
+                <xpath expr="//group[1]" position="after">
+                    <field name="note" widget="helptext" placeholder="Put notes here..."/>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</openerp>

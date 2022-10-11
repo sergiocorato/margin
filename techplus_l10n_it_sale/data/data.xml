@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+    <data noupdate="1">
+
+        <!-- Default Transport Document Storage Configuration -->
+        <record id="transport_document_store_config" model="ir.config_parameter">
+            <field name="key">transport.document.location</field>
+            <field name="value">file:oe_filestore</field>
+        </record>
+
+        <!-- Default Custom Export Notification Storage Configuration -->
+        <record id="custom_export_notification_store_config" model="ir.config_parameter">
+            <field name="key">custom.export.notification.location</field>
+            <field name="value">file:oe_filestore</field>
+        </record>
+
+        <record id="seq_type_product_to_return" model="ir.sequence.type">
+            <field name="name">Product To Return</field>
+            <field name="code">seq.product.to.return</field>
+        </record>
+
+        <record id="seq_product_to_return" model="ir.sequence">
+            <field name="name">Product To Return</field>
+            <field name="code">seq.product.to.return</field>
+            <field name="prefix">PTR/</field>
+            <field name="padding" eval="7"/>
+        </record>
+
+        <record id="sequence_goods_loading_registry_entry" model="ir.sequence.type">
+            <field name="name">Goods Loading Registry</field>
+            <field name="code">goods.loading.registry.entry</field>
+        </record>
+
+        <record id="sequence_goods_loading_registry_entry_seq" model="ir.sequence">
+            <field name="name">Account goods loading registry sequence</field>
+            <field name="code">goods.loading.registry.entry</field>
+            <field name="prefix">USA</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+        </record>
+
+        <!-- Default Lot Lock Delta Days -->
+        <record id="lot_lock_delta_days" model="ir.config_parameter">
+            <field name="key">techplus_l10n_it_sale.lot_lock_delta_days</field>
+            <field name="value">7</field>
+        </record>
+
+    </data>
+
+</openerp>

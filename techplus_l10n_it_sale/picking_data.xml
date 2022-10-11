@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <!-- Sequence -->
+
+        <record id="seq_type_ddt" model="ir.sequence.type">
+            <field name="name">DDT</field>
+            <field name="code">stock.ddt</field>
+        </record>
+        <record id="seq_ddt" model="ir.sequence">
+            <field name="name">DDT</field>
+            <field name="code">stock.ddt</field>
+            <field name="prefix">DDT/</field>
+        </record>
+
+        <!-- Carriage Condition -->
+
+        <record id="carriage_condition_PF" model="carriage.condition">
+            <field name="name">PORTO FRANCO</field>
+            <field name="incoterm_code">DDP</field>
+        </record>
+        <record id="carriage_condition_PA" model="carriage.condition">
+            <field name="name">PORTO ASSEGNATO</field>
+            <field name="incoterm_code">EXW</field>
+        </record>
+
+        <!-- Goods Description -->
+
+        <record id="goods_description_CAR" model="goods.description">
+            <field name="name">CARTONE</field>
+        </record>
+        <record id="goods_description_BAN" model="goods.description">
+            <field name="name">BANCALE</field>
+        </record>
+        <record id="goods_description_SFU" model="goods.description">
+            <field name="name">SFUSI</field>
+        </record>
+        <record id="goods_description_CBA" model="goods.description">
+            <field name="name">CARTONI-BANCALI</field>
+        </record>
+
+        <!-- Transportation Reason -->
+
+        <record id="transportation_reason_VEN" model="transportation.reason">
+            <field name="name">VENDITA</field>
+            <field name="reason">sale</field>
+        </record>
+        <record id="transportation_reason_VIS" model="transportation.reason">
+            <field name="name">CONTO VISIONE</field>
+            <field name="reason">sale_or_return</field>
+        </record>
+        <record id="transportation_reason_RES" model="transportation.reason">
+            <field name="name">RESO</field>
+            <field name="reason">return</field>
+        </record>
+        <record id="transportation_reason_COM" model="transportation.reason">
+            <field name="name">COMODATO D'USO</field>
+            <field name="reason">loan</field>
+        </record>
+        <record id="transportation_reason_CNT" model="transportation.reason">
+            <field name="name">CONTO VENDITA</field>
+            <field name="reason">sale_on_consignment</field>
+        </record>
+        <record id="transportation_reason_RIP" model="transportation.reason">
+            <field name="name">RIPARAZIONE</field>
+            <field name="reason">repair</field>
+        </record>
+        <record id="transportation_reason_CTL" model="transportation.reason">
+            <field name="name">CONTO LAVORO</field>
+            <field name="reason">tolling</field>
+        </record>
+
+        <!-- Transportation -->
+
+        <record id="transportation_REC" model="transportation.responsible">
+            <field name="name">DESTINATARIO</field>
+        </record>
+        <record id="transportation_CAR" model="transportation.responsible">
+            <field name="name">VETTORE</field>
+        </record>
+        <record id="transportation_SEN" model="transportation.responsible">
+            <field name="name">MITTENTE</field>
+        </record>
+
+    </data>
+</openerp>

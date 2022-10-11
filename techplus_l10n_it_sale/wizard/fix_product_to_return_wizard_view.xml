@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard view -->
+        <record id="view_fix_product_to_return_wizard_form" model="ir.ui.view">
+            <field name="name">fix.product.to.return.wizard.view</field>
+            <field name="model">fix.product.to.return.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Fix Product To Return Wizard" version="7.0">
+                    <group>
+                        <field name="action"/>
+                    </group>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight" confirm="Are you sure?"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_fix_product_to_return_wizard" model="ir.actions.act_window">
+            <field name="name">Fix Product To Return Wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fix.product.to.return.wizard</field>
+            <field name="view_id" ref="view_fix_product_to_return_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+        <!-- Tree: Account Invoice -->
+        <record id="invoice_tree" model="ir.ui.view">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="has_attachments"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Tree: Account Invoice (Supplier) -->
+        <record id="invoice_tree" model="ir.ui.view">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="has_attachments"/>
+                </field>
+            </field>
+        </record>
+
+		<!-- Form: Account Invoice (Customer) -->
+        <record id="invoice_form" model="ir.ui.view">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="techplus_l10n_it.invoice_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//sheet" position="before">
+                    <field name="warning_message" widget="form_warnings" options="{'fixed': 'top'}"/>
+                </xpath>
+
+            	<xpath expr="//field[@name='number']/.." position="after">
+					<div attrs="{'invisible': [('type','!=','out_invoice')]}"><field name="shipping_invoice"/><label for="shipping_invoice" style="vertical-align: bottom;"/></div>
+				</xpath>
+
+				<xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="identity_document_id" domain="[('partner_id', '=', partner_id), ('is_expired', '=', False)]" context="{'default_partner_id': partner_id,}" attrs="{'invisible': ['|', ('partner_id', '=', False), ('identity_document_required', '=', False)], 'required': [('identity_document_required', '=', True)]}"/>
+                    <field name="partner_shipping_id" attrs="{'required': [('shipping_invoice', '=', True)]}" context="{'show_address': 1}" options="{'always_reload': True, 'highlight_first_line': True}"/>
+				</xpath>
+
+				<xpath expr="//field[@name='payment_ids']/.." position="after">
+					<page string="Shipping" attrs="{'invisible': [('shipping_invoice', '=', False)]}">
+                        <button name="%(action_invoice_edit_shipping_info_wizard)d" string="Edit Shipping Info" type="action"/>
+						<group>
+							<group>
+								<field name="carriage_condition_id"/>
+								<field name="goods_description_id"/>
+								<field name="transportation_reason_id"/>
+								<field name="transportation_responsible_id" on_change="on_change_transportation_responsible(transportation_responsible_id, context)"/>
+								<field name="carrier_id"/>
+							</group>
+							<group>
+								<field name="number_of_packages"/>
+								<field name="manual_weight"/>
+								<field name="manual_weight_net"/>
+								<field name="manual_volume"/>
+								<field name="date_transport"/>
+								<field name="date_receipt"/>
+							</group>
+						</group>
+
+                        <group string="Custom" groups="techplus_l10n_it_sale.group_extra_ue_invoices">
+                            <field name="custom_export_notification_required"/>
+                            <field name="commodity_code_required"/>
+                            <field name="custom_export_notification_id"/>
+                        </group>
+
+						<label for="shipping_notes"/>
+						<field name="shipping_notes"/>
+					</page>
+				</xpath>
+
+                <xpath expr="//notebook/page[@string='Invoice Lines']" position="before">
+                    <page string="Margin Scheme Lines" attrs="{'invisible': [('is_margin_scheme', '=', False)]}">
+                        <button name="%(action_add_margin_scheme_invoce_line_wizard)d" states="draft,proforma2" string="Add Line" type="action" class="oe_right oe_edit_only"/>
+                        <field name="margin_scheme_line_ids">
+                            <tree editable="bottom" create="0">
+                                <field name="sequence" widget="handle"/>
+                                <field name="register_line_id"/>
+                                <field name="name"/>
+                                <field name="commodity_code_id" groups="techplus_l10n_it_sale.group_extra_ue_invoices"/>
+                                <field name="amount"/>
+                                <field name="state" invisible="1"/>
+                                <button name="%(action_change_margin_scheme_invoce_line_wizard)d" states="draft,proforma2" string="Change Amount" type="action" icon="terp-stock_format-default" class="oe_edit_only"/>
+                            </tree>
+                        </field>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="ms_amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="ms_amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="ms_amount_total" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="ms_residual" groups="account.group_account_user" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <div class="oe_clear"></div>
+                    </page>
+                </xpath>
+
+                <xpath expr="//notebook/page[@string='Invoice Lines']/field[@name='invoice_line']/tree/field[@name='quantity']" position="before">
+                    <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id, 'default_supplier_id': parent.partner_id}" widget="many2one_select_popup" groups="techplus_l10n_it_sale.group_margin_scheme"/>
+                    <field name="kept_product_id" domain="[('product_id', '=', product_id), ('partner_id', '=', parent.partner_id), ('state', '!=', 'accounted')]" widget="many2one_select_popup" string="KP"/>
+                    <field name="commodity_code_id" groups="techplus_l10n_it_sale.group_extra_ue_invoices"/>
+                    <field name="is_margin_scheme" on_change="on_change_is_margin_scheme(is_margin_scheme, product_id, parent.fiscal_position, quantity, parent.partner_id, uos_id, parent.date_invoice, parent.type, context)" groups="techplus_l10n_it_sale.group_margin_scheme"/>
+                </xpath>
+
+                <xpath expr="//field[@name='invoice_line']" position="attributes">
+                    <attribute name="context">{'type': type, 'default_analytic_account_id': default_analytic_account_id, 'default_is_margin_scheme': is_margin_scheme}</attribute>
+                </xpath>
+
+                <!-- <field name="fiscal_position" position="attributes">
+                    <attribute name="on_change">on_change_fiscal_position(fiscal_position,type,context)</attribute>
+                    <attribute name="required">1</attribute>
+                </field> -->
+
+                <field name="fiscal_position" position="after">
+                    <field name="rel_orders_origin"/>
+                    <field name="is_margin_scheme" groups="base.group_system,base.group_erp_manager"/>
+                    <field name="identity_document_required" groups="base.group_system,base.group_erp_manager"/>
+
+                </field>
+
+                <xpath expr="//page/group/group/field[@name='move_id']" position="after">
+                    <field name="invoice_number" groups="base.group_system,base.group_erp_manager"/>
+                    <field name="move_name" groups="base.group_system,base.group_erp_manager"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[last()]" position="after">
+                    <page name="orders" string="Orders" attrs="{'invisible': [('has_orders', '=', False)]}">
+                        <field name="has_orders" invisible="1"/>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Search: Account Invoice -->
+        <record id="view_account_invoice_filter" model="ir.ui.view">
+            <field name="name">account.invoice.select</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+            	<field name="partner_id" position="before">
+                    <field name="product_id"/>
+                    <field name="custom_export_notification_required"/>
+                    <field name="internal_number"/>
+                    <filter name="missing_export_notification" string="Missing Export Notification" domain="[('custom_export_notification_required', '=', True), ('custom_export_notification_id', '=', False), ('type', '=', 'out_invoice')]"/>
+                </field>
+            </field>
+        </record>
+
+
+        <!-- Form: Account Invoice (Supplier) -->
+        <record id="invoice_supplier_form" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="techplus_l10n_it.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//sheet" position="before">
+                    <field name="warning_message" widget="form_warnings" options="{'fixed': 'top'}"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[@string='Invoice']/field[@name='invoice_line']/tree/field[@name='quantity']" position="after">
+                    <field name="lot_id" attrs="{'required': [('is_margin_scheme', '=', True)]}" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id, 'default_supplier_id': parent.partner_id}" widget="many2one_select_popup"/>
+                    <field name="is_margin_scheme" on_change="on_change_is_margin_scheme(is_margin_scheme, product_id, parent.fiscal_position, quantity, parent.partner_id, uos_id, parent.date_invoice, parent.type, context)" groups="techplus_l10n_it_sale.group_margin_scheme"/>
+                </xpath>
+
+                <!-- <field name="fiscal_position" position="attributes">
+                    <attribute name="on_change">on_change_fiscal_position(fiscal_position,type,context)</attribute>
+                    <attribute name="required">1</attribute>
+                </field> -->
+
+                <field name="fiscal_position" position="after">
+                    <field name="rel_orders_origin"/>
+                    <field name="is_margin_scheme" groups="base.group_system,base.group_erp_manager"/>
+                    <field name="identity_document_required" groups="base.group_system,base.group_erp_manager"/>
+                </field>
+
+                <xpath expr="//page/group/group/field[@name='move_id']" position="after">
+                    <field name="invoice_number" groups="base.group_system,base.group_erp_manager"/>
+                    <field name="move_name" groups="base.group_system,base.group_erp_manager"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[last()]" position="after">
+                    <page name="orders" string="Orders" attrs="{'invisible': [('has_orders', '=', False)]}">
+                        <field name="has_orders" invisible="1"/>
+                        <label for="purchase_order_ids"/>
+                        <field name="purchase_order_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="date_order"/>
+                                <field name="notes"/>
+                                <field name="payment_term_id"/>
+                                <field name="amount_untaxed" sum="Total Untaxed"/>
+                                <field name="amount_total" sum="Total Total"/>
+                                <field name="state" invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+	</data>
+</openerp>
+

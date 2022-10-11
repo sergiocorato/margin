@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard view -->
+        <record id="view_stock_picking_out_split_margin_scheme_lines_form" model="ir.ui.view">
+            <field name="name">stock.picking.out.split.margin.scheme.lines.view</field>
+            <field name="model">stock.picking.out.split.margin.scheme.lines</field>
+            <field name="arch" type="xml">
+                <form string="Split margin scheme lines wizard" version="7.0">
+                    <div class="help-text">
+                        <span>If a delivery order conteins both margin scheme product lines and new product lines, the delivery order will be splitted in two different ones.</span>
+                    </div>
+                    <footer class="wizard_footer">
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard start action -->
+        <record id="action_stock_picking_out_split_margin_scheme_lines" model="ir.actions.act_window">
+            <field name="name">Split margin scheme lines wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.picking.out.split.margin.scheme.lines</field>
+            <field name="view_id" ref="view_stock_picking_out_split_margin_scheme_lines_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- object menu entry -->
+        <record id="stock_picking_out_split_margin_scheme_lines" model="ir.values">
+            <field name="name">Split margin scheme lines wizard</field>
+            <field name="model">stock.picking.out</field>
+            <field name="key">action</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_stock_picking_out_split_margin_scheme_lines'))" />
+        </record>
+
+    </data>
+</openerp>

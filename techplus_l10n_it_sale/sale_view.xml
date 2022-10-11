@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+        <!-- Form: Sale Order (Delivery) -->
+        <record id="view_order_withcarrier_form" model="ir.ui.view">
+            <field name="name">delivery.sale.order_withcarrier.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="delivery.view_order_withcarrier_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//notebook//label[@for='carrier_id']/../div[last()]" position="after">
+                    <field name="carrier_type" invisible="1"/>
+                    <field name="carriage_condition_id" on_change="on_change_carriage_condition(carriage_condition_id, context)"/>
+                </xpath>
+
+                <xpath expr="//notebook//label[@for='carrier_id']" position="attributes">
+                    <attribute name="on_change">on_change_carrier_id(carrier_id, context)</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('carrier_type', '=', 'picking_from_stock')]}</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Form: Sale Order -->
+		<record id="view_order_form_other_data_inherit" model="ir.ui.view">
+			<field name="name">sale.order.form.other.data.inherit</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale_stock.view_order_form_inherit"/>
+			<field name="arch" type="xml">
+
+                <field name="origin" position="replace"/>
+                <xpath expr="//field[@name='client_order_ref']" position="after">
+                    <field name="origin"/>
+                    <field name="services_only" groups="base.group_system,base.group_erp_manager"/>
+                </xpath>
+
+                <field name="shop_id" position="attributes">
+                    <attribute name="on_change">onchange_shop_id(shop_id, partner_id, context)</attribute>
+                </field>
+
+                <field name="partner_invoice_id" position="replace">
+                    <label for="partner_invoice_id"/>
+                    <div>
+                        <field name="partner_invoice_id"/>
+                        <button name="%(action_sale_order_change_invoice_address_wizard)d" string="Change" type="action" groups="base.group_system,base.group_erp_manager"/>
+                    </div>
+                </field>
+
+                <xpath expr="//form//label[@for='invoice_lines']/.." position="replace"/>
+
+                <xpath expr="//form/field[@name='name']" position="replace">
+                    <notebook name="order_line">
+                        <page string="Description" name="name">
+                            <field name="name"/>
+                        </page>
+                        <page string="Invoice Lines" name="invoice_lines">
+                            <field name="invoice_lines"/>
+                        </page>
+                        <page string="Lot Locks" name="lot_locks">
+                            <field name="lot_lock_ids" readonly="1">
+                                <tree>
+                                    <field name="lot_id"/>
+                                    <field name="begin_time"/>
+                                    <field name="expiration_time"/>
+                                    <field name="lock_reason"/>
+                                    <field name="unlock_reason"/>
+                                    <field name="lock_user"/>
+                                    <field name="unlock_user"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+
+				<xpath expr="//header/button[last()]" position="after">
+                    <button string="Create Gifts" name="%(action_sale_order_gift_wizard)d" type="action" states="draft,sent"/>
+                    <button name="%(action_change_sale_order_tax_wizard)d" string="Change Taxes" type="action" groups="base.group_sale_manager"/>
+                </xpath>
+
+				<field name="fiscal_position" position="after">
+					<field name="validity"/>
+				</field>
+
+				<xpath expr="//field[@name='fiscal_position']/../.." position="after">
+				    <label for="shipping_notes"/>
+				    <field name="shipping_notes"/>
+				</xpath>
+
+                <xpath expr="//form/group/group/field[@name='price_unit']" position="before">
+                    <field name="lot_id" widget="many2one_select_popup_text" context="{'tree_view_ref': 'techplus_l10n_it_sale.view_production_lot_search_popup_tree', 'default_product_id': product_id, 'search_default_product_id': product_id}" on_change="lot_id_change(product_id, lot_id, context)" groups="techplus_l10n_it_sale.group_lot_lock_user" domain="[('stock_available','&gt;', 0.00000000001)]"/>
+                    <field name="lot_lock_id" widget="has_value" groups="techplus_l10n_it_sale.group_lot_lock_manager" options="{'on_click_popup': 1}"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
+                    <field name="lot_id" widget="many2one_select_popup_text" options="{'center_circle': true}" context="{'tree_view_ref' : 'techplus_l10n_it_sale.view_production_lot_search_popup_tree'}" on_change="lot_id_change(product_id, lot_id, context)" groups="techplus_l10n_it_sale.group_lot_lock_user" domain="[('stock_available','&gt;', 0.00000000001)]"/>
+                </xpath>
+
+				<xpath expr="//field[@name='order_line']/tree/field[last()]" position="after">
+                    <field name="has_rel_invoices" invisible="1"/>
+                    <button name="action_open_rel_invoice" string="Invoices" type="object" icon="gtk-open" attrs="{'invisible': [('has_rel_invoices', '=', False)]}"/>
+                    <field name="lot_lock_id" widget="has_value" groups="techplus_l10n_it_sale.group_lot_lock_user"/>
+                    <button name="%(action_lot_lock_create_wizard)d" string="New Lot Lock" type="action" icon="lock_add" groups="techplus_l10n_it_sale.group_lot_lock_manager" attrs="{'invisible': [('lot_lock_id', '!=', False)]}"/>
+                    <button name="%(action_lot_lock_disable_wizard)d" string="Disable Lot Lock" type="action" icon="lock_delete" groups="techplus_l10n_it_sale.group_lot_lock_manager" attrs="{'invisible': [('lot_lock_id', '=', False)]}"/>
+                </xpath>
+
+			</field>
+		</record>
+
+        <!-- Search: Sale Order -->
+        <record id="view_sales_order_filter" model="ir.ui.view">
+            <field name="name">sale.order.list.select</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="order_line_name" string="Product Name or Description" filter_domain="['|',('order_line_name','ilike',self),('product_id','ilike',self)]"/>
+                    <field name="product_id"/>
+                </field>
+            </field>
+        </record>
+
+	</data>
+</openerp>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Tree: Custom Export Notification -->
+        <record model="ir.ui.view" id="custom_export_notification_tree">
+            <field name="name">custom.export.notification.tree</field>
+            <field name="model">custom.export.notification</field>
+            <field name="arch" type="xml">
+                <tree string="Custom Export Notification Tree">
+                    <field name="invoice_id"/>
+                    <field name="date"/>
+                    <field name="mrn_number"/>
+                    <field name="awb_number"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form: Custom Export Notification -->
+        <record model="ir.ui.view" id="custom_export_notification_form">
+            <field name="name">custom.export.notification.form</field>
+            <field name="model">custom.export.notification</field>
+            <field name="arch" type="xml">
+                <form string="Custom Export Notification Form" version="7.0">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="invoice_id" context="{'form_view_ref': 'account.invoice_form'}"/></h1>
+                        </div>
+
+                        <div class="oe_right oe_button_box">
+                            <!-- buttons here -->
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="mrn_number"/>
+                                <field name="awb_number"/>
+                            </group>
+                            <group>
+                                <field name="date"/>
+                                <field name="amount"/>
+                            </group>
+                        </group>
+
+                        <label for="file"/>
+                        <field name="file" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search: Custom Export Notification -->
+        <record model="ir.ui.view" id="custom_export_notification_search">
+            <field name="name">custom.export.notification.search</field>
+            <field name="model">custom.export.notification</field>
+            <field name="arch" type="xml">
+                <search string="Custom Export Notification Search View">
+                    <field name="invoice_id" />
+                    <field name="mrn_number"/>
+                    <field name="awb_number"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action: Custom Export Notification -->
+        <record model="ir.actions.act_window" id="action_custom_export_notification">
+            <field name="name">Custom Export Notifincations</field>
+            <field name="res_model">custom.export.notification</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="custom_export_notification_search"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new custom export notification.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</openerp>

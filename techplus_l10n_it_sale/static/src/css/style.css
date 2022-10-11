@@ -1,0 +1,14 @@
+.openerp ul.picking_contents {
+    list-style-type: disc;
+    list-style-position: inside;
+    padding: 0px;
+    margin: 0px;
+    min-width: 200px;
+}
+
+.openerp ul.picking_contents > li {
+    margin: 0px;
+    padding-left: 0px;
+    padding-bottom: 2px;
+    font-size: 11px;
+}

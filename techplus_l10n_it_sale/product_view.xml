@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Form: Product Supplierinfo-->
+        <record id="product_supplierinfo_form_view" model="ir.ui.view">
+            <field name="name">product.supplierinfo.form.view</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='price']" position="after">
+                    <field name="note"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Form: Product (purchase) -->
+        <record id="sale_product_normal_form_view" model="ir.ui.view">
+            <field name="name">product.normal.supplier.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="techplus_base.product_normal_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header" position="after">
+                    <field name="warning_message" widget="form_warnings" options="{'fixed': 'top'}"/>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</openerp>

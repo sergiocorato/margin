@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Workflow Definition -->
+        <record id="wkf_goods_loading_register_line" model="workflow">
+            <field name="name">wkf.goods.loading.register.line</field>
+            <field name="osv">goods.loading.register.line</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- Workflow Actions -->
+        <record id="act_register_line_draft" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_goods_loading_register_line"/>
+            <field name="name">draft</field>
+            <field name="flow_start" eval="True"/>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'draft'})</field>
+        </record>
+        <record id="act_register_line_loaded" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_goods_loading_register_line"/>
+            <field name="name">Loaded</field>
+            <field name="kind">function</field>
+            <field name="action">set_loaded()</field>
+        </record>
+        <record id="act_register_line_unloaded" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_goods_loading_register_line"/>
+            <field name="name">Unloaded</field>
+            <field name="kind">function</field>
+            <field name="action">set_unloaded()</field>
+        </record>
+        <record id="act_register_line_returned" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_goods_loading_register_line"/>
+            <field name="name">Returned</field>
+            <field name="kind">function</field>
+            <field name="action">set_returned()</field>
+        </record>
+
+        <!-- Workflow Transitions -->
+        <record id="register_line_draft_loaded" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_draft"/>
+            <field name="act_to" ref="act_register_line_loaded"/>
+            <field name="signal">set_loaded</field>
+        </record>
+        <record id="register_line_loaded_unloaded" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_loaded"/>
+            <field name="act_to" ref="act_register_line_unloaded"/>
+            <field name="signal">set_unloaded</field>
+        </record>
+        <record id="register_line_loaded_returned" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_loaded"/>
+            <field name="act_to" ref="act_register_line_returned"/>
+            <field name="signal">set_returned</field>
+        </record>
+        <record id="register_line_unloaded_loaded" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_unloaded"/>
+            <field name="act_to" ref="act_register_line_loaded"/>
+            <field name="signal">set_loaded</field>
+        </record>
+        <record id="register_line_returned_loaded" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_returned"/>
+            <field name="act_to" ref="act_register_line_loaded"/>
+            <field name="signal">set_loaded</field>
+        </record>
+        <record id="register_line_loaded_draft" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_loaded"/>
+            <field name="act_to" ref="act_register_line_draft"/>
+            <field name="signal">set_draft</field>
+        </record>
+        <record id="register_line_unloaded_draft" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_unloaded"/>
+            <field name="act_to" ref="act_register_line_draft"/>
+            <field name="signal">set_draft</field>
+        </record>
+        <record id="register_line_returned_draft" model="workflow.transition">
+            <field name="act_from" ref="act_register_line_returned"/>
+            <field name="act_to" ref="act_register_line_draft"/>
+            <field name="signal">set_draft</field>
+        </record>
+
+    </data>
+</openerp>

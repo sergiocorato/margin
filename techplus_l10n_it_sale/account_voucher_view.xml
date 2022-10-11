@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Form: Account Voucher (Sale) -->
+        <record model="ir.ui.view" id="view_vendor_receipt_form">
+            <field name="name">account.voucher.form</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="account_voucher.view_vendor_receipt_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header/button[1]" position="after">
+                    <button string="Refresh Lines" name="button_refresh_voucher_lines" type="object" states="draft"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Form: Account Voucher (Purchase) -->
+        <record model="ir.ui.view" id="view_purchase_receipt_form">
+            <field name="name">account.voucher.purchase.form</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="account_voucher.view_purchase_receipt_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="is_margin_scheme" groups="techplus_l10n_it_sale.group_margin_scheme" on_change="on_change_margin_scheme(is_margin_scheme, context)"/>
+                    <field name="identity_document_id" attrs="{'required': [('is_margin_scheme', '=', True)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='line_dr_ids']/tree/field[@name='name']" position="before">
+                    <field name="lot_id" groups="techplus_l10n_it_sale.group_margin_scheme" on_change="on_change_lot_id(lot_id, context)"/>
+                    <field name="product_id" groups="techplus_l10n_it_sale.group_margin_scheme"/>
+                    <field name="kept_product_id" domain="[('product_id', '=', product_id), ('partner_id', '=', parent.partner_id), ('state', '!=', 'accounted')]" widget="many2one_select_popup" string="Kept Product"/>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</openerp>
